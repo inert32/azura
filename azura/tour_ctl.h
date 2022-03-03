@@ -15,7 +15,7 @@ struct tour_t {
 
 class tour_ctl {
 public:
-	tour_ctl(std::string path);
+	tour_ctl(std::filesystem::path file_path);
 private:
 	std::list<tour_t> arr;
 };
