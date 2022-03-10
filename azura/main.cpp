@@ -6,62 +6,52 @@
 #include <sstream>
 #include <vector>
 #include <filesystem>
+#include <string>
+#include <iomanip>
+
 #include "base.h"
 
-#include "tour_ctl.h"
-#include "tourist_ctl.h"
-#include "employe_ctl.h"
+#include "ui.h"
 
-void test_print(tourist_ctl* t) {
-	auto max = t->update();
-	std::cout << "Id\tSurname\tName\tPatronymic\tSeries\tNumber\tPhone\n";
+/* TODO List
+tourist_ctl                 : 9/9 
+tours_ctl                   : 0/9
+employe_ctl                 : 0/9
 
-	for (int i = 0; i < max; i++) {
-		tourist_t record;
-		record = *(t->get(i));
-		std::cout << record.id << '\t' << record.surname << '\t' << record.name
-			<< '\t' << record.patronymic << '\t' << record.passport_series
-			<< '\t' << record.passport_number << '\t' << record.phone_number << std::endl;
-	}
-}
+min_tui                     : 4/5
+curses_ui                   : 0/5
+win_ui                      : 0/5
 
-void test_insert(tourist_ctl* t) {
-	tourist_t test_input;
-	std::cout << "F> ";
-	std::getline(std::cin, test_input.surname);
-	std::cout << "I> ";
-	std::getline(std::cin, test_input.name);
-	std::cout << "O> ";
-	std::getline(std::cin, test_input.patronymic);
-	std::cout << "S> ";
-	std::getline(std::cin, test_input.passport_series);
-	std::cout << "N> ";
-	std::getline(std::cin, test_input.passport_number);
-	std::cout << "P> ";
-	std::getline(std::cin, test_input.phone_number);
-	t->create(&test_input);
-}
+DB recovery                 : no
+Backup before edit/remove   : no
+
+*/
 
 int main() {
-	std::cout << "v0.01 " << std::endl
+	std::cout << "v0.02 " << std::endl
 		 << "Build date: " << __TIMESTAMP__ << std::endl;
-	// Setup files
-	tourist_ctl t;
+
 	try {
-		t.init(std::filesystem::absolute("tourists.txt"));
+		min_tui ui;
+		tourist_ctl t(std::filesystem::absolute("tourists.txt"));
+		while (true) {
+			ui.draw_table(&t);
+			ui.choose(&t);
+		}
 	}
 	catch (const std::exception &e) {
+		if (strcmp(e.what(),"Quit") == 0) return 0;
 		std::cout << "Exception recieved: " << e.what() << std::endl;
+		system("pause");
 		return -1;
 	}
-
-	test_print(&t);
-	test_insert(&t);
-
-	std::cout << "----------------\n";
-
-	test_print(&t);
 	
 	system("pause");
 	return 0;
+}
+
+void util_resetfile(std::fstream& f) {
+	f.clear();
+	f.seekg(0);
+	f.seekp(0);
 }

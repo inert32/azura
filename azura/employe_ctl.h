@@ -3,7 +3,7 @@
 #include "base.h"
 
 struct employe_t {
-	id_t id;
+	db_id_t id;
 	std::string surname;
 	std::string name;
 	std::string patronymic;
@@ -14,7 +14,7 @@ class employe_ctl {
 public:
 	employe_ctl(std::string path);
 private:
-	std::list<employe_t> arr;
+	std::vector<employe_t> arr;
 };
 
-#endif __EMPLOYE_CTL_H__
+#endif

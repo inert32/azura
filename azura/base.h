@@ -1,7 +1,12 @@
 #ifndef __BASE_H__
 #define __BASE_H__
 
-typedef unsigned long long int id_t;
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+
+typedef unsigned long long int db_id_t;
 
 struct date_t {
 	unsigned char day;
@@ -9,10 +14,10 @@ struct date_t {
 	unsigned int year;
 };
 
-enum except_types {
-	_null,
-	io_failure,
-	file_corrupt
-};
+void util_resetfile(std::fstream& f);
 
-#endif __BASE_H__
+#include "tour_ctl.h"
+#include "tourist_ctl.h"
+#include "employe_ctl.h"
+
+#endif
