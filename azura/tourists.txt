@@ -1,2 +1,0 @@
-0,Surname,Name,Patronymic,0123,456789,81234567890
-1,Surname1,Name1,Patronymic1,0533,824749,81236325890
