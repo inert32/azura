@@ -39,13 +39,10 @@ Backup before edit/remove   : no
 */
 
 int main() {
-    std::cout << "v0.02 " << std::endl
-         << "Build date: " << __TIMESTAMP__ << std::endl;
-
-	min_tui ui;
+	curses_ui ui;
+    ui.msg("Test! Проверка!");
 	ui.pause();
     try {
-		ui.msg(std::filesystem::absolute("tourists.txt").generic_string());
 		file_io tourists_file(std::filesystem::absolute("tourists.txt"));
         tourist_ctl t(&tourists_file);
         while (ui.main_cycle(&t)) {}

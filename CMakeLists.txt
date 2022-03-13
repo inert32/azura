@@ -14,6 +14,8 @@ src/ui/ui_min.h src/ui/ui_curses.h src/ui/ui_win.h)
 target_compile_features(azura PUBLIC cxx_std_17)
 
 if(CMAKE_COMPILER_IS_GNUCC)
+    set(CURSES_NEED_WIDE TRUE)
+    
     target_link_libraries(azura stdc++fs)
     find_package(Curses REQUIRED)
     if (${CURSES_FOUND})
@@ -22,3 +24,6 @@ if(CMAKE_COMPILER_IS_GNUCC)
     endif()    
 	add_compile_options(-Werror -Wpedantic)
 endif()
+
+get_target_property(OUT azura LINK_LIBRARIES)
+message(STATUS ${OUT})

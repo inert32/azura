@@ -13,6 +13,9 @@ public:
     bool main_cycle(tourist_ctl* t);
     bool main_cycle(tour_ctl* t);
     bool main_cycle(employe_ctl* t);
+    
+private:
+    void _test_curses();
 };
 
 #endif
