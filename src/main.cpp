@@ -14,6 +14,7 @@
 
 #include "base.h"
 #include "io.h"
+#include "secure.h"
 #include "parsers.h"
 #include "ui/ui.h"
 
@@ -26,12 +27,12 @@ tourist_ctl                 : 9/9
 tours_ctl                   : 0/9
 employe_ctl                 : 0/9
 
-min_tui                     : 4/5
+min_tui                     : 5/5
 curses_ui                   : 0/5
 win_ui                      : 0/5
 
-io                          : 0/6
-parsers                     : 0/3
+io                          : 2/6
+parsers                     : 1/3
 
 DB recovery                 : no
 Backup before edit/remove   : no
@@ -40,7 +41,6 @@ Backup before edit/remove   : no
 
 int main() {
 	curses_ui ui;
-    ui.msg("Test! Проверка!");
 	ui.pause();
     try {
 		file_io tourists_file(std::filesystem::absolute("tourists.txt"));

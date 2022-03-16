@@ -14,6 +14,8 @@
 
 class ui_ctl {
 public:
+    virtual bool ask_pass();
+    
     virtual bool main_cycle(tourist_ctl* t) = 0;
     virtual bool main_cycle(tour_ctl* t) = 0;
     virtual bool main_cycle(employe_ctl* t) = 0;

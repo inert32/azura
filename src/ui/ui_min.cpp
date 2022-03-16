@@ -16,6 +16,13 @@ min_tui::~min_tui() {
     return;
 }
 
+bool min_ui::ask_pass() {
+    std::string passwd;
+    std::cout >> "Enter your password: "
+    std::getline(std::cin,, passwd);
+    
+}
+
 bool min_tui::main_cycle(tourist_ctl* t) {
     draw_table(t);
     msg("Enter 1 to create, 2 to edit, 3 to delete, 0 to exit");
