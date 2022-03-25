@@ -31,8 +31,8 @@ public:
     void edit(tourist_ctl* t);
     void remove(tourist_ctl* t);
 
-	void pause();
-	void msg(const std::string& msg);
+     void pause();
+     void msg(const std::string& msg);
 };
 
 #endif

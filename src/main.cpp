@@ -11,6 +11,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <iomanip>
+#include <string_view>
 
 #include "base.h"
 #include "io.h"
@@ -40,10 +41,9 @@ Backup before edit/remove   : no
 */
 
 int main() {
-	curses_ui ui;
-	ui.pause();
+     az_ui ui;
     try {
-		file_io tourists_file(std::filesystem::absolute("tourists.txt"));
+          file_io tourists_file(std::filesystem::absolute("tourists.txt"));
         tourist_ctl t(&tourists_file);
         while (ui.main_cycle(&t)) {}
     }

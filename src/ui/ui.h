@@ -14,10 +14,12 @@
 
 #include "ui_min.h"
 
-#include "ui_curses.h"
+#define az_ui min_tui
 
-#ifndef __linux__
-    #include "ui_win.h"
+#ifdef AZ_GUI_WX
+    #undef az_ui
+    #include "ui_wx.h"
+    #define az_ui wx_gui
 #endif
 
 #endif

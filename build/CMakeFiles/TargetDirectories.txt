@@ -1,3 +1,0 @@
-/home/alex/hdd/repos/azura/build/CMakeFiles/rebuild_cache.dir
-/home/alex/hdd/repos/azura/build/CMakeFiles/edit_cache.dir
-/home/alex/hdd/repos/azura/build/CMakeFiles/azura.dir

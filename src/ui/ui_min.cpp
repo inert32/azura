@@ -1,4 +1,6 @@
-#include <stdexcept>
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
+
 #include "ui_min.h"
 
 #ifndef __linux__
@@ -20,7 +22,6 @@ bool min_ui::ask_pass() {
     std::string passwd;
     std::cout >> "Enter your password: "
     std::getline(std::cin,, passwd);
-    
 }
 
 bool min_tui::main_cycle(tourist_ctl* t) {
@@ -50,18 +51,22 @@ bool min_tui::main_cycle(tourist_ctl* t) {
 }
 
 void min_tui::pause() {
-	system("pause");
+     system("pause");
 }
 
-void min_tui::msg(const std::string& msg) {
-	std::cout << msg << std::endl;
+void min_tui::msg(std::string_view msg) {
+     std::cout << msg << std::endl;
+}
+
+void min_tui::msg(std::string_view head, std::string_view msg) {
+     std::cout << head << std::endl << msg << std::endl;
 }
 
 void min_tui::draw_table(tourist_ctl* t) {
     auto max = t->db_size();
     std::cout << "Id\tSurname\tName\tPatronymic\tSeries\tNumber\tPhone\n";
 
-	tourist_t* record;
+     tourist_t* record;
     for (int i = 0; i < max; i++) {
         record = t->record_get(i);
         std::cout << record->id << '\t' << record->surname << '\t' << record->name
@@ -84,9 +89,9 @@ void min_tui::input(tourist_ctl* t) {
     std::cout << "S> ";
     std::cin >> test_input.passport_series;
     std::cout << "N> ";
-	std::cin >> test_input.passport_number;
+     std::cin >> test_input.passport_number;
     std::cout << "P> ";
-	std::cin >> test_input.phone_number;
+     std::cin >> test_input.phone_number;
     t->record_make(&test_input);
 }
 
@@ -105,11 +110,11 @@ void min_tui::edit(tourist_ctl* t) {
         std::cout << "O> ";
         std::getline(std::cin, record.patronymic);
         std::cout << "S> ";
-		std::cin >> record.passport_series;
+          std::cin >> record.passport_series;
         std::cout << "N> ";
-		std::cin >> record.passport_number;
+          std::cin >> record.passport_number;
         std::cout << "P> ";
-		std::cin >> record.phone_number;
+          std::cin >> record.phone_number;
         t->record_edit(i, &record);
     }
 }

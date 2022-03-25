@@ -9,9 +9,9 @@ public:
     /* tourist_ctl API:
     * tourist_t* record_get(id)              - Require id of the required record.
     *                                        - Return pointer to the record or nullptr if fail.
-	*
+     *
     * bool record_make(record)               - Require tourist_t struct to write.
-	*                                        - Return true if record created or false otherwise.
+     *                                        - Return true if record created or false otherwise.
     * 
     * bool record_del(db_id_t)               - Require id of the required record.
     *                                        - Return true if record removed or false otherwise.
@@ -27,17 +27,17 @@ public:
     */
     tourist_t* record_get(const db_id_t id);
     bool record_make(tourist_t* record);
-	bool record_del(db_id_t id);
-	bool record_edit(db_id_t id, tourist_t* record);
+     bool record_del(db_id_t id);
+     bool record_edit(db_id_t id, tourist_t* record);
 
-	bool db_sync();
-	db_id_t db_size();
+     bool db_sync();
+     db_id_t db_size();
 
-	tourist_ctl(file_io* f);
+     tourist_ctl(file_io* f);
     ~tourist_ctl();
 private:
     std::vector<tourist_t> arr;
-	file_io* io;
+     file_io* io;
 };
 
 #endif
