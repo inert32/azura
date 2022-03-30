@@ -4,17 +4,14 @@
 /* Header file ui.h
    Contain all avaliable UIs:
    min_tui - based on simple console UI
-   curses_ui - *curses console UI
-   win_ui - Windows-only graphical UI
-   
-   As well enables UIs if avaliable (based on platform and *curses presence)
+   wx_gui  - wxWidgets GUI
 */
 
 #include "ui_base.h"
 
 #include "ui_min.h"
 
-#define az_ui min_tui
+#define az_ui min_ui
 
 #ifdef AZ_GUI_WX
     #undef az_ui

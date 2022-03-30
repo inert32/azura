@@ -3,13 +3,17 @@
 
 #ifdef AZ_GUI_WX
 
+#include <wx/wxprec.h>
+
 #include <string_view>
 #include "../db/tour_ctl.h"
 #include "../db/tourist_ctl.h"
 #include "../db/employe_ctl.h"
 
-class wx_gui {
+class wx_gui : public ui_ctl, public wxApp {
 public:
+    wx_gui();
+    ~wx_gui();
     bool ask_pass();
     
     bool main_cycle(tourist_ctl* t);
