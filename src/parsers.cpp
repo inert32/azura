@@ -97,24 +97,6 @@ bool parser_tour_t(const std::string &str, tour_t* t) {
 
 bool parser_employe_t(const std::string &str, employe_t* t);
 
-bool parser_validate_date(const date_t* d) {
-    if (d->day < 0 || d->day > 31) {
-       return false;
-    }
-    if (d->month < 0 || d->month > 12) {
-       return false;
-    }
-    if (d->day == 31 &&
-       (d->month == 4 || d->month == 6 || d->month == 9 || d->month == 11)) {
-       return false;
-    }
-    if (d->month == 2 && d->day == 29 && // Если 29 февраля
-       !((d->year % 4 == 0 && d->year % 100 != 0) || d->year % 400 == 0)) { // и год не високосный
-       return false;
-    }
-    return true;
-}
-
 date::date(const std::string& str) {
     set(str);
 }

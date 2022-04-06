@@ -9,14 +9,11 @@
 
 #include "ui_base.h"
 
-#include "ui_min.h"
-
-#define az_ui min_ui
-
 #ifdef AZ_GUI_WX
-    #undef az_ui
     #include "ui_wx.h"
-    #define az_ui wx_gui
+#else
+    #include "ui_min.h"
+    #define AZ_UI_MIN
 #endif
 
 #endif

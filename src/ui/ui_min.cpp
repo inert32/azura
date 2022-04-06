@@ -7,11 +7,13 @@
 
 #include "ui_min.h"
 
-min_ui::min_ui() {
-#ifndef __linux__
-    SetConsoleCP(1251);
-    SetConsoleOutputCP(1251);
-#endif
+min_ui::min_ui()  
+{
+    #ifndef __linux__
+    // Enabling Unicode in Windows console
+    SetConsoleCP(65001);
+    SetConsoleOutputCP(65001);
+    #endif
 }
 
 min_ui::~min_ui() {
@@ -19,14 +21,14 @@ min_ui::~min_ui() {
 }
 
 bool min_ui::login() {
-    std::string passwd;
+    /*std::string passwd;
 	std::cout << "Enter your password: ";
-    std::getline(std::cin, passwd);
+    std::getline(std::cin, passwd);*/
 	return true;
 }
 
-bool min_ui::main_cycle(tourist_ctl* t) {
-    draw_table(t);
+bool min_ui::main_cycle() {
+    draw_table(tourists);
     msg("Enter 1 to create, 2 to edit, 3 to delete, 0 to exit");
     int c;
     std::cout << ">";
@@ -34,13 +36,13 @@ bool min_ui::main_cycle(tourist_ctl* t) {
     std::cin.get();
     switch (c) {
     case 1:
-      input(t);
+      input(tourists);
       break;
     case 2:
-      edit(t);
+      edit(tourists);
       break;
     case 3:
-      remove(t);
+      remove(tourists);
       break;
     case 0:
       [[fallthrough]];
@@ -122,13 +124,13 @@ void min_ui::remove(tourist_ctl* t) {
     std::cin >> i;
     t->record_del(i);
 }
-
+/*
 bool min_ui::main_cycle(tour_ctl* t) {
     return false;
 }
 bool min_ui::main_cycle(employe_ctl* t) {
     return false;
 }
-
+*/
 void min_ui::input(tour_ctl* t) {}
 void min_ui::input(employe_ctl* t) {}

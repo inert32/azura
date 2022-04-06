@@ -17,12 +17,19 @@ class ui_ctl {
 public:
     virtual bool login() = 0;
     
-    virtual bool main_cycle(tourist_ctl* t) = 0;
+    bool initdb();
+    
+    virtual bool main_cycle() = 0;
+    /*virtual bool main_cycle(tourist_ctl* t) = 0;
     virtual bool main_cycle(tour_ctl* t) = 0;
-    virtual bool main_cycle(employe_ctl* t) = 0;
+    virtual bool main_cycle(employe_ctl* t) = 0;*/
     
     virtual void msg(std::string_view msg) = 0;
     virtual void msg(std::string_view head, std::string_view msg) = 0;
+protected:
+    tourist_ctl* tourists;
+    tour_ctl* tours;
+    employe_ctl* employes;
 };
 
 #endif

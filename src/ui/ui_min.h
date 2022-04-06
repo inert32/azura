@@ -18,9 +18,7 @@ public:
     
     bool login();
     
-    bool main_cycle(tourist_ctl* t);
-    bool main_cycle(tour_ctl* t);
-    bool main_cycle(employe_ctl* t);
+    bool main_cycle();
     
     void msg(std::string_view msg);
     void msg(std::string_view head, std::string_view msg);

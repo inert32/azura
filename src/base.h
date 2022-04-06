@@ -47,4 +47,4 @@ struct employe_t {
 	bool _corrupt = false;
 };
 
-#endif
+#endif /* __BASE_H__ */
