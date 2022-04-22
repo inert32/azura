@@ -36,8 +36,3 @@ bool db_base<tourist_t>::db_sync() {
         io->write_record(&arr[x], x);
     return true;
 }
-
-template <>
-db_id_t db_base<tourist_t>::db_size() {
-    return arr.size();
-}

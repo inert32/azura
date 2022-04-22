@@ -3,10 +3,7 @@
 
 #include <string>
 #include <vector>
-
-#define AZ_VER_MAJOR "@PROJECT_VERSION_MAJOR@"
-#define AZ_VER_MINOR "@PROJECT_VERSION_MINOR@"
-#define AZ_VER_PATCH "@PROJECT_VERSION_PATCH@"
+#include "locale.h"
 
 typedef unsigned long long int db_id_t;
 

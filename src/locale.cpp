@@ -29,4 +29,4 @@ const std::string AZ_LOC_TAB_PASSPORT_SERIES = "Серия паспорта";
 const std::string AZ_LOC_TAB_PHONE_NUMBER = "Номер телефона";
 
 const std::string AZ_LOC_ERR_EXCEPTION = "Исключение: ";
-const std::string AZ_LOC_ERR_NOFILE = "файл недоступен.";
+const std::string AZ_LOC_ERR_NOFILE = "Файл недоступен: ";

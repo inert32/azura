@@ -30,4 +30,4 @@ protected:
     ui_tables_list current_table;
 };
 
-#endif
+#endif /* __UI_BASE_H__ */

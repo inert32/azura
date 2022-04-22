@@ -40,7 +40,8 @@ Backup before edit/remove   : no
 
 start() {
 	AZ_CURRENT_UI ui;
-    ui.login();
+    if (!ui.login()) return -1;
+	
 	try {
 		//file_io tours_file(std::filesystem::absolute("tours.txt"));
 		file_io<tourist_t> tourists_file(std::filesystem::absolute("tourists.txt"));

@@ -7,8 +7,8 @@
 #include "io.h"
 #include "base.h"
 
-bool parser_tourist_t(const std::string &str, tourist_t* t) {
-    std::string buf;
+bool parse_tourist_t(const std::string &str, tourist_t* t) {
+   std::string buf;
 	size_t left = 0, right = str.find(','), sw = 0;
 	bool is_good = true;
 	try {
@@ -50,7 +50,7 @@ bool parser_tourist_t(const std::string &str, tourist_t* t) {
 	return is_good;
 }
 
-bool parser_tour_t(const std::string &str, tour_t* t) {
+bool parse_tour_t(const std::string &str, tour_t* t) {
     date d("");
     std::string buf;
     size_t left = 0, right = str.find(','), sw = 0;
@@ -95,7 +95,8 @@ bool parser_tour_t(const std::string &str, tour_t* t) {
     return (!t->manager == 0) ? true : false;
 }
 
-bool parser_employe_t(const std::string &str, employe_t* t);
+bool parse_employe_t(const std::string &str, employe_t* t) {}
+
 
 date::date(const std::string& str) {
     set(str);

@@ -14,8 +14,8 @@ private:
     date_t dt;
 };
 
-bool parser_tourist_t(const std::string &str, tourist_t* t);
-bool parser_tour_t(const std::string &str, tour_t* t);
-bool parser_employe_t(const std::string &str, employe_t* t);
+bool parse_tourist_t(const std::string &str, tourist_t* t);
+bool parse_tour_t(const std::string &str, tour_t* t);
+bool parse_employe_t(const std::string &str, employe_t* t);
 
 #endif /* __PARSERS_H__ */

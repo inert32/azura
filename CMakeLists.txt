@@ -6,8 +6,10 @@ if(MSVC_VERSION LESS 1910)
 endif()
 
 project(azura_proj)
-set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 3)
+
+add_compile_definitions(AZ_VER_MAJOR=0)
+add_compile_definitions(AZ_VER_MINOR=3)
+add_compile_definitions(AZ_VER_PATCH=0)
 
 set(_AZ_WINMAIN )
 
@@ -17,8 +19,7 @@ src/db/db_employe.cpp src/db/db_tour.cpp src/db/db_tourist.cpp
 src/ui/ui_min.cpp src/ui/ui_wx.cpp
 
 src/base.h src/io.h src/parsers.h src/secure.h src/locale.h src/db_base.h
-src/ui/ui.h src/ui/ui_base.h 
-src/ui/ui_min.h src/ui/ui_wx.h)
+src/ui/ui.h src/ui/ui_base.h src/ui/ui_min.h src/ui/ui_wx.h)
 
 target_compile_features(azura PUBLIC cxx_std_17)
 
@@ -72,7 +73,7 @@ if (AZ_GUI_WX)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC)
-	add_compile_options(-Werror -Wpedantic -Wall)
+    add_compile_options(-Werror -Wpedantic -Wall -g3 -O0)
 elseif(MSVC)
     add_compile_options(/Wall /We)
     add_compile_definitions(_UNICODE)

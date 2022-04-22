@@ -13,7 +13,7 @@ min_ui::min_ui() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     #endif
-    std::cout << "Azura v" << AZ_VER_MAJOR << '.' << AZ_VER_MINOR << std::endl;
+    std::cout << "Azura v" << AZ_VER_MAJOR << '.' << AZ_VER_MINOR << '.' << AZ_VER_PATCH << std::endl;
 }
 
 min_ui::~min_ui() {

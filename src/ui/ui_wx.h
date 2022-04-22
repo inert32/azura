@@ -82,6 +82,6 @@ private:
 	tour_ctl* tours = nullptr;
 	employe_ctl* employes = nullptr;
 };
-#endif
+#endif /* AZ_GUI_WX */
 
-#endif
+#endif /* __UI_WX_H__ */
