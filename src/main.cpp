@@ -18,11 +18,10 @@
 #include "io.h"
 #include "parsers.h"
 
-#include "db/tour_ctl.h"
-#include "db/tourist_ctl.h"
-#include "db/employe_ctl.h"
+#include "db_base.h"
 
 #include "ui/ui.h"
+#include "locale.h"
 
 /* TODO List
 tourist_ctl                 : 9/9 
@@ -30,8 +29,6 @@ tours_ctl                   : 0/9
 employe_ctl                 : 0/9
 
 min_tui                     : 5/5
-curses_ui                   : 0/5
-win_ui                      : 0/5
 
 io                          : 2/6
 parsers                     : 1/3
@@ -41,27 +38,20 @@ Backup before edit/remove   : no
 
 */
 
-bool ui_ctl::initdb() {
-    try {
-        file_io tourists_file(std::filesystem::absolute("tourists.txt"));
-        //file_io tours_file(std::filesystem::absolute("tours.txt"));
-        
-        tourists = new tourist_ctl(&tourists_file);
-        //tour_ctl b(&tours_file);
-    }
-    catch (const std::exception &e) {
-        msg("Exception recieved", e.what());
-        return false;
-    }
-    return true;
-}
-
-#ifdef AZ_UI_MIN
-int main(int argc, char** argv) {
-    min_ui ui;
+start() {
+	AZ_CURRENT_UI ui;
     ui.login();
-    if (ui.initdb())
-        while (ui.main_cycle()) {}
+	try {
+		//file_io tours_file(std::filesystem::absolute("tours.txt"));
+		file_io<tourist_t> tourists_file(std::filesystem::absolute("tourists.txt"));
+
+		auto tourists = new db_base<tourist_t>(&tourists_file);
+		ui.get_tables(tourists, nullptr, nullptr);
+		ui.main();
+	}
+	catch (const std::exception &e) {
+		ui.msg(AZ_LOC_ERR_EXCEPTION, e.what());
+		return -1;
+	}
     return 0;
 }
-#endif /* AZ_UI_MIN */

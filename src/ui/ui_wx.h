@@ -7,6 +7,8 @@
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
 #endif
+#include <wx/grid.h>
+#include <wx/event.h>
 
 #include <string_view>
 #include "../db/tour_ctl.h"
@@ -15,34 +17,71 @@
 #include "ui_base.h"
 
 enum class wx_enums {
-    ID_Hello = 1,
-    file_new,
-    file_open,
-    file_save
+	mm_swuser = 1,
+	mm_swtab,
+
+    entry_add,
+	entry_edit,
+	entry_remove,
+
+	db_new,
+	db_save,
+	db_backup,
+	db_remove,
+
+	btn_ok,
+	btn_cancel
 };
 
-class wx_gui : public wxApp, public ui_ctl {
+class wx_gui : public ui_ctl {
 public:
-    wx_gui();
-    ~wx_gui();
-    bool login();
-    bool main_cycle();
+	wx_gui();
+	~wx_gui();
+
+	bool login();
+	void main();
+	void get_tables(tourist_ctl* a, tour_ctl* b, employe_ctl* c);
     
     void msg(std::string_view msg);
     void msg(std::string_view head, std::string_view msg);
+};
+
+class wx_gui_app : public wxApp {
+public:
+    wx_gui_app();
+    ~wx_gui_app();
     
 private:
     virtual bool OnInit();
 };
 
-class wx_gui_internal : public wxFrame {
-public: 
-    wx_gui_internal();
-    void OnHello(wxCommandEvent& event);
-    void OnExit(wxCommandEvent& event);
-    void OnAbout(wxCommandEvent& event);
-};
+class wx_gui_main : public wxFrame{
+public:
+	wx_gui_main();
+	~wx_gui_main();
 
+private:
+	void init_loadmenus();
+
+	void draw_table(wxPaintEvent& event);
+	// Menus functions
+	void ctl_mm_swuser(wxCommandEvent& event);
+	void ctl_mm_swtab(wxCommandEvent& event);
+	void ctl_exit(wxCommandEvent& event);
+
+	void ctl_entry_add(wxCommandEvent& event);
+	void ctl_entry_edit(wxCommandEvent& event);
+	void ctl_entry_remove(wxCommandEvent& event);
+
+	void ctl_db_new(wxCommandEvent& event);
+	void ctl_db_save(wxCommandEvent& event);
+	void ctl_db_backup(wxCommandEvent& event);
+	void ctl_db_remove(wxCommandEvent& event);
+
+	tourist_ctl* tourists = nullptr;
+	tour_ctl* tours = nullptr;
+	employe_ctl* employes = nullptr;
+};
 #endif
 
 #endif

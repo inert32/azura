@@ -9,11 +9,18 @@
 
 #include "ui_base.h"
 
+#define start() int main(int argc, char** argv)
+
 #ifdef AZ_GUI_WX
     #include "ui_wx.h"
+    #define AZ_CURRENT_UI wx_gui
+    #ifdef __VISUALC__
+        #undef start()
+        #define start() int wmain(int argc, wchar_t **argv)
+    #endif /* __VISUALC__ */
 #else
+    #define AZ_CURRENT_UI min_ui
     #include "ui_min.h"
-    #define AZ_UI_MIN
-#endif
+#endif /* AZ_GUI_WX */
 
-#endif
+#endif /* __UI_H__ */

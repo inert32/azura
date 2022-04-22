@@ -9,27 +9,25 @@
 */
 
 #include <string_view>
-#include "../db/tour_ctl.h"
-#include "../db/tourist_ctl.h"
-#include "../db/employe_ctl.h"
+#include "../base.h"
+#include "../db_base.h"
+
+enum class ui_tables_list {
+    tourist_t,
+    tour_t,
+    employe_t
+};
 
 class ui_ctl {
 public:
     virtual bool login() = 0;
-    
-    bool initdb();
-    
-    virtual bool main_cycle() = 0;
-    /*virtual bool main_cycle(tourist_ctl* t) = 0;
-    virtual bool main_cycle(tour_ctl* t) = 0;
-    virtual bool main_cycle(employe_ctl* t) = 0;*/
+    virtual void get_tables(db_base<tourist_t>* a, db_base<tour_t>* b, db_base<employe_t>* c) = 0;
+    virtual void main() = 0;
     
     virtual void msg(std::string_view msg) = 0;
     virtual void msg(std::string_view head, std::string_view msg) = 0;
 protected:
-    tourist_ctl* tourists;
-    tour_ctl* tours;
-    employe_ctl* employes;
+    ui_tables_list current_table;
 };
 
 #endif

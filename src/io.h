@@ -9,26 +9,39 @@ constexpr unsigned int file_line_length = 64;
 enum class fio_codes {
 	struct_complete,
 	struct_corrupt,
-	eof
+	eof,
+    denied
 };
 
 /* Code results:
 	* 0 - struct is complete
 	* 1 - struct is corrupt
 	* 2 - reached EOF
+    * 3 - access denied for this uid
 	*/
 
-class file_io {
+template<class T>
+class io_base {
+public:
+    virtual fio_codes read_record(T* rec, const db_id_t id) = 0;
+    virtual bool write_record(const T* rec, const db_id_t id) = 0;
+
+    virtual void sync() = 0;
+};
+
+template<class T>
+class file_io : public io_base<T> {
 public:
     file_io(const std::filesystem::path &path);
+	~file_io();
     
-    bool write_rec(const tourist_t* t);
-    void read_rec(tourist_t* t, fio_codes* code);
+    fio_codes read_record(T* t, const db_id_t id);
+    bool write_record(const T* rec, const db_id_t id);
     
-    void wipe_file();
+    void sync();
 private:
     void resetfile();
-    void _create_file(const std::filesystem::path &file_path);
+    void create_file(const std::filesystem::path &file_path);
     
     std::filesystem::path _file_path;
     std::fstream file_handle;
