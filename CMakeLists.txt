@@ -7,20 +7,20 @@ endif()
 
 project(azura_proj)
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 2)
+set(PROJECT_VERSION_MINOR 3)
 
-add_executable(azura 
-src/main.cpp src/io.cpp src/parsers.cpp src/secure.cpp
-src/db/employe_ctl.cpp src/db/tour_ctl.cpp src/db/tourist_ctl.cpp 
+set(_AZ_WINMAIN )
+
+add_executable(azura "${_AZ_WINMAIN}"
+src/main.cpp src/io.cpp src/parsers.cpp src/secure.cpp src/locale.cpp
+src/db/db_employe.cpp src/db/db_tour.cpp src/db/db_tourist.cpp 
 src/ui/ui_min.cpp src/ui/ui_wx.cpp
 
-src/base.h src/io.h src/parsers.h src/secure.h
-src/db/employe_ctl.h src/db/tour_ctl.h src/db/tourist_ctl.h 
+src/base.h src/io.h src/parsers.h src/secure.h src/locale.h src/db_base.h
 src/ui/ui.h src/ui/ui_base.h 
 src/ui/ui_min.h src/ui/ui_wx.h)
 
 target_compile_features(azura PUBLIC cxx_std_17)
-
 
 if (MSVC)
     file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/ext/include")
@@ -55,6 +55,8 @@ if (AZ_GUI_WX)
         include(${wxWidgets_USE_FILE})
         target_link_libraries(azura ${wxWidgets_LIBRARIES})
     elseif(MSVC)
+        set(_AZ_WINMAIN "WIN32")
+        set(_AZ_OUTPUT_NAME "azura")
         message(NOTICE "Make sure wxWidgets devel files installed to ${PROJECT_BINARY_DIR}/ext/")
         set(wxWidgets_CONFIGURATION mswu)
         if (AZ_DEBUG)
@@ -74,4 +76,12 @@ if(CMAKE_COMPILER_IS_GNUCC)
 elseif(MSVC)
     add_compile_options(/Wall /We)
     add_compile_definitions(_UNICODE)
+endif()
+
+# Rename executable file if compiling without GUI
+
+if(AZ_GUI_WX)
+	set_target_properties(azura PROPERTIES OUTPUT_NAME "azura")
+else()
+	set_target_properties(azura PROPERTIES OUTPUT_NAME "azura_nogui")
 endif()
