@@ -14,12 +14,11 @@ add_compile_definitions(AZ_VER_PATCH=0)
 set(_AZ_WINMAIN )
 
 add_executable(azura "${_AZ_WINMAIN}"
-src/main.cpp src/io.cpp src/parsers.cpp src/secure.cpp src/locale.cpp
-src/db/db_employe.cpp src/db/db_tour.cpp src/db/db_tourist.cpp 
-src/ui/ui_min.cpp src/ui/ui_wx.cpp
+src/main.cpp src/io.cpp src/parsers.cpp src/secure.cpp
+src/ui/ui_wx.cpp src/locale.cpp
 
-src/base.h src/io.h src/parsers.h src/secure.h src/locale.h src/db_base.h
-src/ui/ui.h src/ui/ui_base.h src/ui/ui_min.h src/ui/ui_wx.h)
+src/base.h src/io.h src/parsers.h src/secure.h src/db_base.h
+src/ui/ui_wx.h src/locale.h)
 
 target_compile_features(azura PUBLIC cxx_std_17)
 
@@ -33,56 +32,41 @@ endif()
 # Debug options
 option (AZ_DEBUG "Debug mode" ON)
 if (AZ_DEBUG OR CMAKE_BUILD_TYPE EQUAL "Debug")
-    set(AZ_DEBUG TRUE)
     message(NOTICE "Enabled debugging build")
+    set(CMAKE_BUILD_TYPE Debug)
     add_compile_definitions(AZ_DEBUG)
-    if(CMAKE_COMPILER_IS_GNUCC)
-         add_compile_options(-g3 -O0)
-    endif()
 endif()
 
 # Setup wxWidgets UI
-option (AZ_GUI_WX "Build wxWidgets UI" OFF)
-if (AZ_GUI_WX)
-    message(NOTICE "Enabled wxWidgets UI")
-    add_compile_definitions(AZ_GUI_WX)
-    set(wxWidgets_USE_UNICODE TRUE)
-    if(CMAKE_COMPILER_IS_GNUCC)
-        if (AZ_DEBUG)
-            set(wxWidgets_USE_DEBUG TRUE)
-        endif()
-    
-        find_package(wxWidgets REQUIRED COMPONENTS core base)
-        include(${wxWidgets_USE_FILE})
-        target_link_libraries(azura ${wxWidgets_LIBRARIES})
-    elseif(MSVC)
-        set(_AZ_WINMAIN "WIN32")
-        set(_AZ_OUTPUT_NAME "azura")
-        message(NOTICE "Make sure wxWidgets devel files installed to ${PROJECT_BINARY_DIR}/ext/")
-        set(wxWidgets_CONFIGURATION mswu)
-        if (AZ_DEBUG)
-            set(wxWidgets_USE_DEBUG TRUE)
-            target_link_libraries(azura "wxmsw31ud_core.lib")
-            target_link_libraries(azura "wxbase31ud.lib")
-        else()
-            target_link_libraries(azura "wxmsw31u_core.lib")
-            target_link_libraries(azura "wxbase31u.lib")
-        endif()
-        set_target_properties(azura PROPERTIES VS_USER_PROPS "${PROJECT_BINARY_DIR}/ext/wxwidgets.props")
+set(wxWidgets_USE_UNICODE TRUE)
+set(wxWidgets_CONFIGURATION mswu)
+if(CMAKE_COMPILER_IS_GNUCC)
+    if (AZ_DEBUG)
+        set(wxWidgets_USE_DEBUG TRUE)
     endif()
+    
+    find_package(wxWidgets REQUIRED COMPONENTS core base adv)
+    include(${wxWidgets_USE_FILE})
+    target_link_libraries(azura ${wxWidgets_LIBRARIES})
+elseif(MSVC)
+    message(NOTICE "Make sure wxWidgets devel files installed to ${PROJECT_BINARY_DIR}/ext/")
+    set(_AZ_WINMAIN "WIN32")
+    if (AZ_DEBUG)
+        set(wxWidgets_USE_DEBUG TRUE)
+        target_link_libraries(azura "wxmsw31ud_core.lib")
+        target_link_libraries(azura "wxbase31ud.lib")
+    else()
+        target_link_libraries(azura "wxmsw31u_core.lib")
+        target_link_libraries(azura "wxbase31u.lib")
+    endif()
+    set_target_properties(azura PROPERTIES VS_USER_PROPS "${PROJECT_BINARY_DIR}/ext/wxwidgets.props")
 endif()
 
+# Add compiler-dependeded options
+
 if(CMAKE_COMPILER_IS_GNUCC)
-    add_compile_options(-Werror -Wpedantic -Wall -g3 -O0)
+    add_compile_options(-Werror -Wpedantic -Wall)
 elseif(MSVC)
     add_compile_options(/Wall /We)
     add_compile_definitions(_UNICODE)
-endif()
-
-# Rename executable file if compiling without GUI
-
-if(AZ_GUI_WX)
-	set_target_properties(azura PROPERTIES OUTPUT_NAME "azura")
-else()
-	set_target_properties(azura PROPERTIES OUTPUT_NAME "azura_nogui")
 endif()

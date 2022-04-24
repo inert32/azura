@@ -15,6 +15,7 @@ template <>
 bool db_base<tourist_t>::record_add(tourist_t* rec) {
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
+    //changed_records.push_back(rec->metadata.id);
     return true;
 }
 
@@ -27,12 +28,6 @@ bool db_base<tourist_t>::record_del(db_id_t id) {
 template <>
 bool db_base<tourist_t>::record_edit(const tourist_t* rec, const db_id_t id) {
     arr[id] = *rec;
-    return true;
-}
-
-template <>
-bool db_base<tourist_t>::db_sync() {    
-    for (auto &x : changed_records) 
-        io->write_record(&arr[x], x);
+    //changed_records.push_back(id);
     return true;
 }

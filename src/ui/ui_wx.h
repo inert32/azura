@@ -1,8 +1,6 @@
 #ifndef __UI_WX_H__
 #define __UI_WX_H__
 
-#ifdef AZ_GUI_WX
-
 #include <wx/wxprec.h>
 #ifndef WX_PRECOMP
     #include <wx/wx.h>
@@ -11,10 +9,14 @@
 #include <wx/event.h>
 
 #include <string_view>
-#include "../db/tour_ctl.h"
-#include "../db/tourist_ctl.h"
-#include "../db/employe_ctl.h"
-#include "ui_base.h"
+#include "../locale.h"
+#include "../db_base.h"
+
+enum class ui_tables_list {
+    tourist_t,
+    tour_t,
+    employe_t
+};
 
 enum class wx_enums {
 	mm_swuser = 1,
@@ -33,34 +35,16 @@ enum class wx_enums {
 	btn_cancel
 };
 
-class wx_gui : public ui_ctl {
-public:
-	wx_gui();
-	~wx_gui();
-
-	bool login();
-	void main();
-	void get_tables(tourist_ctl* a, tour_ctl* b, employe_ctl* c);
-    
-    void msg(std::string_view msg);
-    void msg(std::string_view head, std::string_view msg);
-};
-
-class wx_gui_app : public wxApp {
-public:
-    wx_gui_app();
-    ~wx_gui_app();
-    
-private:
-    virtual bool OnInit();
-};
-
-class wx_gui_main : public wxFrame{
+class wx_gui_main : public wxFrame {
 public:
 	wx_gui_main();
 	~wx_gui_main();
 
+	void msg(std::string_view msg);
+    void msg(std::string_view head, std::string_view msg);
 private:
+	bool init_db();
+
 	void init_loadmenus();
 
 	void draw_table(wxPaintEvent& event);
@@ -78,10 +62,21 @@ private:
 	void ctl_db_backup(wxCommandEvent& event);
 	void ctl_db_remove(wxCommandEvent& event);
 
-	tourist_ctl* tourists = nullptr;
-	tour_ctl* tours = nullptr;
-	employe_ctl* employes = nullptr;
+	bool run = false;
+	ui_tables_list current_table;
+
+    io_base<tourist_t>* tourists_io = nullptr;
+    io_base<tour_t>*    tours_io    = nullptr;
+    io_base<employe_t>* employes_io  = nullptr;
+
+    db_base<tourist_t>* tourists    = nullptr;
+	db_base<tour_t>*    tours       = nullptr;
+	db_base<employe_t>* employes    = nullptr;
 };
-#endif /* AZ_GUI_WX */
+
+class wx_gui : public wxApp {
+public:
+	virtual bool OnInit();
+};
 
 #endif /* __UI_WX_H__ */

@@ -20,7 +20,8 @@
 
 #include "db_base.h"
 
-#include "ui/ui.h"
+#include "ui/ui_wx.h"
+
 #include "locale.h"
 
 /* TODO List
@@ -35,24 +36,7 @@ parsers                     : 1/3
 
 DB recovery                 : no
 Backup before edit/remove   : no
-
 */
 
-start() {
-	AZ_CURRENT_UI ui;
-    if (!ui.login()) return -1;
-	
-	try {
-		//file_io tours_file(std::filesystem::absolute("tours.txt"));
-		file_io<tourist_t> tourists_file(std::filesystem::absolute("tourists.txt"));
-
-		auto tourists = new db_base<tourist_t>(&tourists_file);
-		ui.get_tables(tourists, nullptr, nullptr);
-		ui.main();
-	}
-	catch (const std::exception &e) {
-		ui.msg(AZ_LOC_ERR_EXCEPTION, e.what());
-		return -1;
-	}
-    return 0;
-}
+IMPLEMENT_APP(wx_gui);
+IMPLEMENT_WX_THEME_SUPPORT;

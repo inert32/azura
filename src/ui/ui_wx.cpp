@@ -1,41 +1,62 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-#ifdef AZ_GUI_WX
-
 #include "ui_wx.h"
 #include "../locale.h"
 
-wx_gui::wx_gui() {}
-
-wx_gui::~wx_gui() {}
-
-bool wx_gui_app::OnInit() {
+bool wx_gui::OnInit() {
 	auto* wnd = new wx_gui_main();
 	wnd->Show(true);
 	return true;
 }
 
-wx_gui_app::~wx_gui_app() {
-}
-
-bool wx_gui::login() { return true; };
-
-void wx_gui::msg(std::string_view msg) {
-	wxMessageBox(msg.data(), "Notice", wxOK | wxICON_INFORMATION);
-}
-void wx_gui::msg(std::string_view head, std::string_view msg) {
-	wxMessageBox(msg.data(), head.data(), wxOK | wxICON_INFORMATION);
-}
-
-wx_gui_main::wx_gui_main() 
-	: wxFrame(NULL, wxID_ANY, AZ_LOC_PROGNAME, wxPoint(100,100), wxSize(800,600)) {
-
+wx_gui_main::wx_gui_main() : wxFrame(NULL, wxID_ANY, AZ_LOC_PROGNAME, wxPoint(100,100), wxSize(800,600)) {
 	Bind(wxEVT_PAINT, &wx_gui_main::draw_table, this, -1);
+
+	if (!init_db()) {
+		std::cerr << "Unable to start" << std::endl;
+		std::cerr << "IO failed for: ";
+		if (tourists_io == nullptr) std::cerr << "tourists_io";
+		if (tours_io == nullptr) std::cerr << "tours_io";
+		if (employes_io == nullptr) std::cerr << "employes_io";
+
+		std::cerr << "DB start failed for: ";
+		if (tourists == nullptr) std::cerr << "tourists";
+		if (tours == nullptr) std::cerr << "tours";
+		if (employes == nullptr) std::cerr << "employes";
+		throw std::runtime_error("^");
+	}
 
 	init_loadmenus();
 	CreateStatusBar();
 }
+
+wx_gui_main::~wx_gui_main() {
+	delete tourists;
+	delete tours;
+	delete employes;
+
+	delete tourists_io;
+	delete tours_io;
+	delete employes_io;
+}
+
+bool wx_gui_main::init_db() {
+	std::cout << "Starting db..." << std::endl;;
+	try {
+		tourists_io = new file_io<tourist_t>(std::filesystem::absolute("tourists.txt"));
+		tourists = new db_base<tourist_t>(tourists_io);
+
+		return true;
+	}
+	catch (const std::exception &e) {
+		msg(AZ_LOC_ERR_EXCEPTION, e.what());
+		return false;
+	}
+}
+
+void wx_gui_main::msg(std::string_view msg) {}
+void wx_gui_main::msg(std::string_view head, std::string_view msg) {}
 
 void wx_gui_main::init_loadmenus() {
 	wxMenu* main_menu = new wxMenu();
@@ -72,6 +93,7 @@ void wx_gui_main::init_loadmenus() {
 }
 
 void wx_gui_main::draw_table(wxPaintEvent& event) {
+	std::cout << "Drawing table..." << std::endl;
 	auto grid = new wxGrid(this, -1, wxPoint(0,0), wxSize(800,600));
 	grid->CreateGrid(tourists->db_size(), 7);
 	grid->HideRowLabels();
@@ -158,5 +180,3 @@ void wx_gui_subwindow::btn_ok(wxCommandEvent& event) {
 void wx_gui_subwindow::btn_cancel(wxCommandEvent& event) {
 	Close(true);
 }*/
-
-#endif

@@ -7,21 +7,19 @@
 #include "base.h"
 
 template<>
-io_codes file_io<tourist_t>::read_record(tourist_t* rec, const db_id_t id) {
-        std::string buf_str;
+io_codes file_io<tourist_t>::read_record(tourist_t* rec) {
+    std::string buf_str;
 
-        _goto_line(id);
-        std::getline(file_handle, buf_str);
+    std::getline(file_handle, buf_str);
 
-	    if (buf_str.empty()) return io_codes::eof;
+    if (buf_str.empty()) return io_codes::eof;
 
-	    return (parse_tourist_t(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
-    }
+    return (parse_tourist_t(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
+}
 
 template<>
-bool file_io<tourist_t>::write_record(const tourist_t* rec, const db_id_t id) {
+bool file_io<tourist_t>::write_record(const tourist_t* rec) {
     if (file_handle.eof()) file_handle.clear();
-    _goto_line(id);
     
     if (file_handle.good()) {
         file_handle.width(64);

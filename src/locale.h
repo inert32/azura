@@ -3,32 +3,32 @@
 
 #include <string>
 
-extern const std::string AZ_LOC_PROGNAME;
+const std::string AZ_LOC_PROGNAME = "Azura";
 
-extern const std::string AZ_LOC_MENU_MM;
-extern const std::string AZ_LOC_MENU_ENTRY;
-extern const std::string AZ_LOC_MENU_DB;
+const std::string AZ_LOC_MENU_MM = "Main";
+const std::string AZ_LOC_MENU_ENTRY = "Record";
+const std::string AZ_LOC_MENU_DB = "Database";
 
-extern const std::string AZ_LOC_MENU_MM_SWUSER;
-extern const std::string AZ_LOC_MENU_MM_SWTAB;
-extern const std::string AZ_LOC_MENU_MM_QUIT;
-extern const std::string AZ_LOC_MENU_ENTRY_ADD;
-extern const std::string AZ_LOC_MENU_ENTRY_EDIT;
-extern const std::string AZ_LOC_MENU_ENTRY_REMOVE;
-extern const std::string AZ_LOC_MENU_DB_NEW;
-extern const std::string AZ_LOC_MENU_DB_SAVE;
-extern const std::string AZ_LOC_MENU_DB_BACKUP;
-extern const std::string AZ_LOC_MENU_DB_REMOVE;
+const std::string AZ_LOC_MENU_MM_SWUSER = "Switch user";
+const std::string AZ_LOC_MENU_MM_SWTAB = "Switch table";
+const std::string AZ_LOC_MENU_MM_QUIT = "Quit";
+const std::string AZ_LOC_MENU_ENTRY_ADD = "New record";
+const std::string AZ_LOC_MENU_ENTRY_EDIT = "Edit record";
+const std::string AZ_LOC_MENU_ENTRY_REMOVE = "Remove record";
+const std::string AZ_LOC_MENU_DB_NEW = "New DB";
+const std::string AZ_LOC_MENU_DB_SAVE = "Save DB";
+const std::string AZ_LOC_MENU_DB_BACKUP = "Backup DB";
+const std::string AZ_LOC_MENU_DB_REMOVE = "Remove DB";
 
-extern const std::string AZ_LOC_TAB_ID;
-extern const std::string AZ_LOC_TAB_SURNAME;
-extern const std::string AZ_LOC_TAB_NAME;
-extern const std::string AZ_LOC_TAB_PATRONYMIC;
-extern const std::string AZ_LOC_TAB_PASSPORT_NUMBER;
-extern const std::string AZ_LOC_TAB_PASSPORT_SERIES;
-extern const std::string AZ_LOC_TAB_PHONE_NUMBER;
+const std::string AZ_LOC_TAB_ID = "id";
+const std::string AZ_LOC_TAB_SURNAME = "Surname";
+const std::string AZ_LOC_TAB_NAME = "Name";
+const std::string AZ_LOC_TAB_PATRONYMIC = "Patronymic";
+const std::string AZ_LOC_TAB_PASSPORT_NUMBER = "Passport number";
+const std::string AZ_LOC_TAB_PASSPORT_SERIES = "Passport series";
+const std::string AZ_LOC_TAB_PHONE_NUMBER = "Phone number";
 
-extern const std::string AZ_LOC_ERR_EXCEPTION;
-extern const std::string AZ_LOC_ERR_NOFILE;
+const std::string AZ_LOC_ERR_EXCEPTION = "Exception occured";
+const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";
 
 #endif /* __LOCALE_H__ */

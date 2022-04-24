@@ -17,24 +17,27 @@ bool parse_tourist_t(const std::string &str, tourist_t* t) {
 			buf = buf.substr(buf.find_first_not_of(' '));
 			if (buf.empty()) is_good = false;
 			switch (sw) {
-			case 0:
-				t->surname = buf;
+         case 0:
+				t->metadata.id = std::stoull(buf);
 				break;
 			case 1:
-				t->name = buf;
+				t->surname = buf;
 				break;
 			case 2:
-				t->patronymic = buf;
+				t->name = buf;
 				break;
 			case 3:
+				t->patronymic = buf;
+				break;
+			case 4:
 				t->passport_series = std::stoi(buf);
 				if (t->passport_series < 1000 || t->passport_series > 9999) is_good = false;
 				break;
-			case 4:
+			case 5:
 				t->passport_number = std::stoi(buf);
 				if (t->passport_number < 100000 || t->passport_number > 999999) is_good = false;
 				break;
-			case 5:
+			case 6:
 				t->phone_number = std::stoll(buf);
 				break;
 			default:
@@ -95,7 +98,9 @@ bool parse_tour_t(const std::string &str, tour_t* t) {
     return (!t->manager == 0) ? true : false;
 }
 
-bool parse_employe_t(const std::string &str, employe_t* t) {}
+bool parse_employe_t(const std::string &str, employe_t* t) {
+   return false;
+}
 
 
 date::date(const std::string& str) {

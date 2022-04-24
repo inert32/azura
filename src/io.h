@@ -40,8 +40,8 @@ enum class io_codes {
 template<class T>
 class io_base {
 public:
-    virtual io_codes read_record(T* rec, const db_id_t id) = 0;
-    virtual bool write_record(const T* rec, const db_id_t id) = 0;
+    virtual io_codes read_record(T* rec) = 0;
+    virtual bool write_record(const T* rec) = 0;
 
     virtual void sync() = 0;
 };
@@ -49,37 +49,47 @@ public:
 template<class T>
 class file_io : public io_base<T> {
 public:
-    file_io(const std::filesystem::path& path) {
-        _file_path = path;
-
-        int tries = 0; // Trying three times to open file
-        while (tries < 3) {
-            file_handle.open(path, std::ios::in | std::ios::out | std::ios::binary);
-            if (!file_handle.good()) {
-                file_handle.close();
-                std::filesystem::remove(path);
-                file_handle.open(path.c_str(), std::ios::out);
-                file_handle.close();
-            }
-            else break;
-            tries++;
-        }
-        if (tries == 3) throw;
-    }
-	~file_io() {
-        file_handle.flush();
-        file_handle.close();
-    }
+    file_io(const std::filesystem::path& path);
+    ~file_io();
     
-    io_codes read_record(T* rec, const db_id_t id);
+    io_codes read_record(T* rec);
 
-    bool write_record(const T* rec, const db_id_t id);
+    bool write_record(const T* rec);
     
-    void sync() {
-        file_handle.flush();
-    }
+    void sync();
 private:
     std::filesystem::path _file_path;
     std::fstream file_handle;
 };
+
+template <class T>
+file_io<T>::file_io(const std::filesystem::path& path) {
+    _file_path = path;
+
+    int tries = 0; // Trying three times to open file
+    while (tries < 3) {
+        file_handle.open(path, std::ios::in | std::ios::out | std::ios::binary);
+        if (!file_handle.good()) {
+            // Recreating file
+            file_handle.close();
+            std::filesystem::remove(path);
+            file_handle.open(path.c_str(), std::ios::out);
+            file_handle.close();
+        }
+        else break;
+        tries++;
+    }
+    if (tries == 3) throw;
+}
+
+template <class T>
+void file_io<T>::sync() {
+    file_handle.flush();
+}
+
+template <class T>
+file_io<T>::~file_io() {
+    file_handle.close();
+}
+
 #endif /* __IO_H__ */
