@@ -2,7 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include "locale.h"
-/*
+
 const std::string AZ_LOC_PROGNAME = "Azura";
 
 const std::string AZ_LOC_MENU_MM = "Main";
@@ -29,4 +29,4 @@ const std::string AZ_LOC_TAB_PASSPORT_SERIES = "Passport series";
 const std::string AZ_LOC_TAB_PHONE_NUMBER = "Phone number";
 
 const std::string AZ_LOC_ERR_EXCEPTION = "Exception occured";
-const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";*/
+const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";

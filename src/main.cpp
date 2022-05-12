@@ -11,6 +11,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <iomanip>
+#include <limits>
 
 #include "base.h"
 #include "secure.h"
@@ -20,7 +21,7 @@
 
 #include "db_base.h"
 
-#include "ui/ui_wx.h"
+#include "ui/ui_min.h"
 
 #include "locale.h"
 
@@ -38,5 +39,31 @@ DB recovery                 : no
 Backup before edit/remove   : no
 */
 
-IMPLEMENT_APP(wx_gui);
-IMPLEMENT_WX_THEME_SUPPORT;
+int main(int argc, char** argv) {
+    auto ui = new min_ui();
+//    try {
+        auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute("tourists.txt"));
+        auto tourists = new db_base<tourist_t>(tourists_io);
+
+        auto tours_io = new file_io<tour_t>(std::filesystem::absolute("tours.txt"));
+        auto tours = new db_base<tour_t>(tours_io);
+        
+        std::cerr << "Main cycle\n";
+
+        while (ui->main(tourists, tours, nullptr)) {}
+        
+        std::cerr << "Leaving" << std::endl;
+        
+        delete tourists;
+        delete tours;
+
+        delete tourists_io;
+        delete tours_io;
+//   }
+//   catch (const std::exception &e) {
+//       ui->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
+//       return -1;
+//   }
+
+    return 0;
+}

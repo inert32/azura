@@ -7,37 +7,93 @@
 #include "base.h"
 
 template<>
-io_codes file_io<tourist_t>::read_record(tourist_t* rec) {
-    std::string buf_str;
-
-    std::getline(file_handle, buf_str);
-
-    if (buf_str.empty()) return io_codes::eof;
-
-    return (parse_tourist_t(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
-}
-
-template<>
 bool file_io<tourist_t>::write_record(const tourist_t* rec) {
+    if (!write_to_disk) {
+        file_handle.close();
+        file_handle.open(_file_path, std::ios::out | std::ios::binary);
+        write_to_disk = true;
+    }
+    
     if (file_handle.eof()) file_handle.clear();
     
     if (file_handle.good()) {
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->metadata.id << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->surname << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->name << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->patronymic << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->passport_series << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->passport_number << ',';
-        file_handle.width(64);
+        file_handle.width(file_line_length);
         file_handle << rec->phone_number << std::endl;
         file_handle.flush();
         return true;
     }
-    else return false;
+    else
+        return false;
+}
+
+template<>
+bool file_io<tour_t>::write_record(const tour_t* rec) {
+    if (!write_to_disk) {
+        file_handle.close();
+        file_handle.open(_file_path, std::ios::out | std::ios::binary);
+        write_to_disk = true;
+    }
+    
+    if (file_handle.eof()) file_handle.clear();
+    
+    if (file_handle.good()) {
+        file_handle.width(file_line_length);
+        file_handle << rec->metadata.id << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->town_from << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->town_to << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->date_start << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->date_end << ',';
+        file_handle.width(file_line_length);
+        for (size_t i = 0; i < rec->tourists_count; i++)
+            file_handle << rec->tourists[i] << ',';
+        file_handle << std::endl;
+        file_handle.flush();
+        return true;
+    }
+    else
+        return false;
+}
+
+template<>
+bool file_io<employe_t>::write_record(const employe_t* rec) {
+    if (!write_to_disk) {
+        file_handle.close();
+        file_handle.open(_file_path, std::ios::out | std::ios::binary);
+        write_to_disk = true;
+    }
+    
+    if (file_handle.eof()) file_handle.clear();
+    
+    if (file_handle.good()) {
+        file_handle.width(file_line_length);
+        file_handle << rec->metadata.id << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->surname << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->name << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->patronymic << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->phone_number << std::endl;
+        file_handle.flush();
+        return true;
+    }
+    else
+        return false;
 }

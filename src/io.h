@@ -6,21 +6,6 @@
 #include "base.h"
 #include "locale.h"
 #include "parsers.h"
-
-#define _goto_line(skip) \
-    db_id_t lines = 0; \
-    while (lines != (skip)) { \
-        char c; \
-        file_handle.read(&c, 1); \
-        if (c == '\n') lines++; \
-    }
-
-#define resetfile() \
-    file_handle.clear(); \
-    file_handle.seekg(0); \
-    file_handle.seekp(0);
-
-
 constexpr unsigned int file_line_length = 64;
 
 enum class io_codes {
@@ -60,14 +45,17 @@ public:
 private:
     std::filesystem::path _file_path;
     std::fstream file_handle;
+    bool write_to_disk = false;
 };
 
 template <class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
     _file_path = path;
+    std::cerr << "Loading " << path << std::endl;
 
     int tries = 0; // Trying three times to open file
     while (tries < 3) {
+        std::cerr << "Try " << tries + 1 << std::endl;
         file_handle.open(path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file_handle.good()) {
             // Recreating file
@@ -79,7 +67,19 @@ file_io<T>::file_io(const std::filesystem::path& path) {
         else break;
         tries++;
     }
-    if (tries == 3) throw;
+    if (tries == 3) throw std::runtime_error("File " + path.generic_string() + " unavaliable");
+}
+
+template<class T>
+io_codes file_io<T>::read_record(T* rec) {
+    std::string buf_str;
+
+    std::getline(file_handle, buf_str);
+
+    if (buf_str.empty()) return io_codes::eof;
+    parsers<T> parser;
+
+    return (parser.parse(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
 }
 
 template <class T>

@@ -1,28 +1,44 @@
 #ifndef __BASE_H__
 #define __BASE_H__
 
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include "locale.h"
 
 typedef unsigned long long int db_id_t;
 
-struct date_t {
-    unsigned char day = 0;
-    unsigned char month = 0;
-    unsigned int year = 0;
+class date {
+public:
+    date(const std::string& str);
+    date();
+    date(unsigned short day, unsigned short month, int year);
+    void set(std::string str);
+    void set(unsigned short day, unsigned short month, int year);
+
+    bool validate();
+
+    friend const bool operator>(const date& d1, const date& d2);
+    friend const bool operator<(const date& d1, const date& d2);
+    friend std::ostream& operator<<(std::ostream& out, const date& date);
+private:
+    unsigned short int day = 1;
+    unsigned short int month = 1;
+    unsigned int year = 1980;
 };
 
 struct _metad {
     db_id_t id = 0;
-    bool _corrupt = false;
+    bool corrupt = false;
+    bool allow = true;
 };
 
 struct tourist_t {
     _metad metadata;
-    std::string surname = "";
-    std::string name = "";
-    std::string patronymic = "";
+    std::string surname;
+    std::string name;
+    std::string patronymic;
     unsigned short int passport_series = 0;
     unsigned int passport_number = 0;
     unsigned long long int phone_number = 0;
@@ -30,20 +46,20 @@ struct tourist_t {
 
 struct tour_t {
     _metad metadata;
-    std::string town_from = "";
-    std::string town_to = "";
-    date_t date_start = { 0, 0, 0 };
-    date_t date_end = { 0, 0, 0 };
+    std::string town_from;
+    std::string town_to;
+    date date_start;
+    date date_end;
     db_id_t manager = 0;
-    unsigned int tourists_count = 0;
+    size_t tourists_count = 0;
     db_id_t* tourists = nullptr;
 };
 
 struct employe_t {
     _metad metadata;
-    std::string surname = "";
-    std::string name = "";
-    std::string patronymic = "";
+    std::string surname;
+    std::string name;
+    std::string patronymic;
     unsigned int phone_number = 0;
 };
 

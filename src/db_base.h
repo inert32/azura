@@ -8,12 +8,13 @@ template <class T>
 class db_base {
 public:
     db_base(io_base<T>* _io);
-    ~db_base() {}
+    ~db_base();
 
-    virtual T* record_get(const db_id_t id);
-    virtual bool record_add(T* rec);
-    virtual bool record_del(const db_id_t id);
-    virtual bool record_edit(const T* rec, const db_id_t id);
+    T* record_get(const db_id_t id);
+    bool record_add(T* rec);
+    bool record_del(const db_id_t id);
+    bool record_edit(const T* rec, const db_id_t id);
+    bool record_exists(const db_id_t id);
 
     bool db_sync();
     
@@ -36,6 +37,11 @@ db_base<T>::db_base(io_base<T>* _io) {
 }
 
 template <class T>
+db_base<T>::~db_base() {
+    db_sync();
+}
+
+template <class T>
 db_id_t db_base<T>::db_size() {
     return arr.size();
 }
@@ -48,7 +54,18 @@ bool db_base<T>::db_sync() {
 
 template <class T>
 T* db_base<T>::record_get(const db_id_t id) {
-    return (arr.size() > 0) ? &(arr[id]) : nullptr;
+    return (arr.empty()) ? nullptr : &(arr[id]);
+}
+
+template <class T>
+bool db_base<T>::record_exists(const db_id_t id) {
+    try {
+        auto x = arr.at(id);
+    } 
+    catch (std::out_of_range&) {
+        return false;
+    }
+    return true;
 }
 
 template <class T>
