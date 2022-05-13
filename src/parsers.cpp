@@ -14,7 +14,8 @@ bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
 	bool is_good = true;
 	try {
 		while (field < 7) {
-			buf = str.substr(left, right - left).substr(buf.find_first_not_of(' '));
+			buf = str.substr(left, right - left);
+         buf = buf.substr(buf.find_first_not_of(' '));
 			if (buf.empty()) is_good = false;
 			switch (field) {
          case 0:
@@ -60,7 +61,8 @@ bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
    bool is_good = true;
    try {
    while (field < 7) {
-         buf = str.substr(left, right - left).substr(buf.find_first_not_of(' '));
+			buf = str.substr(left, right - left);
+         buf = buf.substr(buf.find_first_not_of(' '));
          if (buf.empty()) is_good = false;
          switch (field) {
          case 0:
@@ -87,8 +89,7 @@ bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
             break;
          case 6: {
             size_t count = 0;
-            t->tourists = parse_tourists_count(buf, &count);
-            t->tourists_count = count;
+            parse_tourists_count(buf, &t->tourists);
             break;
          }
          default:
@@ -111,7 +112,8 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
 	bool is_good = true;
 	try {
 		while (field < 7) {
-			buf = str.substr(left, right - left).substr(buf.find_first_not_of(' '));
+			buf = str.substr(left, right - left);
+         buf = buf.substr(buf.find_first_not_of(' '));
 			if (buf.empty()) is_good = false;
 			switch (field) {
          case 0:
@@ -135,7 +137,7 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
 			field++;
 			left = right + 1;
 			right = str.find(',', right + 1);
-			if (right == -1) right = str.length();
+			if (right == str.npos) right = str.length();
 		}
 	}
 	catch (std::exception &e) { return false; }

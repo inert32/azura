@@ -51,7 +51,6 @@ private:
 template <class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
     _file_path = path;
-    std::cerr << "Loading " << path << std::endl;
 
     int tries = 0; // Trying three times to open file
     while (tries < 3) {

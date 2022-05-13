@@ -34,8 +34,7 @@ bool file_io<tourist_t>::write_record(const tourist_t* rec) {
         file_handle.flush();
         return true;
     }
-    else
-        return false;
+    else return false;
 }
 
 template<>
@@ -60,14 +59,17 @@ bool file_io<tour_t>::write_record(const tour_t* rec) {
         file_handle.width(file_line_length);
         file_handle << rec->date_end << ',';
         file_handle.width(file_line_length);
-        for (size_t i = 0; i < rec->tourists_count; i++)
-            file_handle << rec->tourists[i] << ',';
+
+        const auto count = rec->tourists.size();
+        for (size_t i = 0; i < count; i++) {
+            file_handle << rec->tourists[i];
+            if (i + 1 < count) file_handle << ',';
+        }
         file_handle << std::endl;
         file_handle.flush();
         return true;
     }
-    else
-        return false;
+    else return false;
 }
 
 template<>
@@ -94,6 +96,5 @@ bool file_io<employe_t>::write_record(const employe_t* rec) {
         file_handle.flush();
         return true;
     }
-    else
-        return false;
+    else return false;
 }

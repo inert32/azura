@@ -51,8 +51,7 @@ struct tour_t {
     date date_start;
     date date_end;
     db_id_t manager = 0;
-    size_t tourists_count = 0;
-    db_id_t* tourists = nullptr;
+    std::vector<db_id_t> tourists;
 };
 
 struct employe_t {
