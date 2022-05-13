@@ -1,0 +1,163 @@
+#ifndef __UI_MIN_H__
+#define __UI_MIN_H__
+
+#include <limits>
+#include "../db_base.h"
+
+enum class tables_list {
+    tourists,
+    tours,
+    employes,
+    _quit
+};
+
+enum class ui_actions {
+    record_add,
+    record_edit,
+    record_del,
+    switch_table,
+    quit
+};
+
+class min_ui {
+public:
+    min_ui();
+
+    void msg(const std::string& msg);
+    bool main(db_base<tourist_t>* tourists, 
+              db_base<tour_t>* tours,
+              db_base<employe_t>* employes);
+
+private:
+    tables_list current;
+};
+
+template<class T>
+class min_ui_main {
+public:
+    void set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes);
+    tables_list main(db_base<T>* table, const tables_list current);
+
+private:
+    void record_add(db_base<T>* table);
+    void record_edit(db_base<T>* table);
+    void record_del(db_base<T>* table);
+    void table_print(db_base<T>* table);
+
+    T create_record(T* old_data = nullptr);
+    ui_actions print_menu();
+    tables_list switch_table();
+
+    void _clean_input_buffer();
+    db_base<tourist_t>* tourists_ptr;
+    db_base<tour_t>* tours_ptr;
+    db_base<employe_t>* employes_ptr;
+};
+
+template<class T>
+void min_ui_main<T>::set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
+    tourists_ptr = tourists;
+    tours_ptr = tours;
+    employes_ptr = employes;
+}
+
+template<class T>
+tables_list min_ui_main<T>::switch_table() {
+    std::cout << "Tables: " << std::endl
+              << "1 - Tourists" << std::endl
+              << "2 - Tours" << std::endl
+              << "3 - Employes" << std::endl
+              << "Enter table number: ";
+    while (true) {
+        char c = 0;
+        std::cin >> c;
+        switch (c) {
+            case '1': return tables_list::tourists;
+            case '2': return tables_list::tours;
+            case '3': return tables_list::employes;
+            default:  break;
+        }
+    }
+}
+
+template<class T>
+void min_ui_main<T>::_clean_input_buffer() {
+    std::cin.get();
+}
+
+template<class T>
+tables_list min_ui_main<T>::main(db_base<T>* table, const tables_list current) {
+    // Check that table here and table from set_tables() same
+    table_print(table);
+    switch (print_menu()) {
+    case ui_actions::record_add:
+        record_add(table);
+        break;
+    case ui_actions::record_edit:
+        record_edit(table);
+        break;
+    case ui_actions::record_del:
+        record_del(table);
+        break;
+    case ui_actions::switch_table:
+        return switch_table();
+    case ui_actions::quit:
+        return tables_list::_quit;
+    }
+    return current;
+}
+
+template<class T>
+ui_actions min_ui_main<T>::print_menu() {
+    std::cout << "1 - New record, 2 - Edit record, 3 - Delete record" << std::endl;
+    std::cout << "9 - Switch table, 0 - Quit : ";
+    while (true) {
+        char c = 0;
+        std::cin >> c;
+        switch (c) {
+            case '1': return ui_actions::record_add;
+            case '2': return ui_actions::record_edit;
+            case '3': return ui_actions::record_del;
+            case '9': return ui_actions::switch_table;
+            case '0': return ui_actions::quit;
+            default: break;
+        }
+    }
+}
+
+template<class T>
+void min_ui_main<T>::record_add(db_base<T>* table) {
+    auto rec = create_record();
+    table->record_add(&rec);
+}
+
+template<class T>
+void min_ui_main<T>::record_edit(db_base<T>* table) {
+    std::cout << "Enter id: ";
+    db_id_t id = 0;
+    std::cin >> id;
+    auto old = table->record_get(id);
+    if (old != nullptr) {
+        std::cout << "Type '-' to enter old value" << std::endl;
+        auto rec = create_record(old);
+        table->record_edit(&rec, id);
+    }
+    else std::cout << "No such record." << std::endl;
+}
+
+template<class T>
+void min_ui_main<T>::record_del(db_base<T>* table) {
+    std::cout << "Enter id: ";
+    db_id_t id = 0;
+    std::cin >> id;
+    if (table->record_exists(id)) {
+        std::cout << "Sure? (y/n) ";
+        char c = 0;
+        std::cin >> c;
+        if (tolower(c) == 'y') table->record_del(id);
+        else std::cout << "Removal canceled" << std::endl;
+    }
+    else std::cout << "No such record." << std::endl;
+}
+
+#endif /* __UI_MIN_H__ */
