@@ -75,13 +75,13 @@ bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
                 t->town_to = buf;
                 break;
             case 3: {
-                date d(buf);
-                if (!(d.validate())) is_good = false;
+                t->date_start.set(buf);
+                if (!(t->date_start.validate())) is_good = false;
                 break;
             }
             case 4: {
-                date d(buf);
-                if (!(d.validate()) is_good = false;
+                t->date_end.set(buf);
+                if (!(t->date_end.validate())) is_good = false;
                 break;
             }
             case 5:
