@@ -54,7 +54,12 @@ bool db_base<T>::db_sync() {
 
 template<class T>
 T* db_base<T>::record_get(const db_id_t id) {
-    return (arr.empty()) ? nullptr : &(arr[id]);
+    try {
+        return &arr.at(id);
+    }
+    catch (const std::exception &e) {
+        return nullptr;
+    }
 }
 
 template<class T>
