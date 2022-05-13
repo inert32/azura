@@ -4,16 +4,41 @@
 
 template<class T>
 class parsers {
-    public:
+public:
     bool parse(const std::string& str, T* t);
     void parse_tourists_count(const std::string &str, std::vector<db_id_t>* list);
 };
 
 template<class T>
-class checker {
+class prettify_records {
 public:
-    void check(T* record);
+    void prettyify(T* record);
+    std::string capitalize(const std::string& str);
 };
+
+std::string phone_to_str(const unsigned long long int number); 
+unsigned long long int str_to_phone(const std::string& buf);
+
+template<class T>
+std::string prettify_records<T>::capitalize(const std::string& str) {
+    std::string new_string;
+    const auto len = str.length();
+    bool word_end = true;
+
+    for (size_t i = 0; i < len; i++) {
+        if (std::isalpha(str[i]) == 0) {
+            word_end = true;
+            new_string += str[i];
+            continue;
+        }
+        if (word_end == true) {
+            word_end = false;
+            new_string += std::toupper(str[i]);
+        }
+        else new_string += std::tolower(str[i]);
+    }
+    return new_string;
+}
 
 template<class T>
 void parsers<T>::parse_tourists_count(const std::string &str, std::vector<db_id_t>* list) {

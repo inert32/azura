@@ -66,7 +66,7 @@ void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
                   << entry->patronymic << '\t'
                   << entry->passport_series << "\t\t"
                   << entry->passport_number << "\t\t"
-                  << entry->phone_number << std::endl;
+                  << phone_to_str(entry->phone_number) << std::endl;
     }
 }
 
@@ -109,7 +109,7 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
                   << entry->surname << '\t'
                   << entry->name << '\t'
                   << entry->patronymic << '\t'
-                  << entry->phone_number << '\t'
+                  << phone_to_str(entry->phone_number) << '\t'
                   << entry->role.pretty() << std::endl;
     }
 }
@@ -165,7 +165,10 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
         tmp.phone_number = old_data->phone_number;
     }
-    else tmp.phone_number = std::stoull(buf);
+    else tmp.phone_number = str_to_phone(buf);
+    prettify_records<tourist_t> pr;
+    pr.prettyify(&tmp);
+
     return tmp;
 }
 

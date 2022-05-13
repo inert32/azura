@@ -148,6 +148,32 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
 }
 
 template<>
-void checker<tourist_t>::check(tourist_t* record) {
-   
+void prettify_records<tourist_t>::prettyify(tourist_t* record) {
+    record->surname = capitalize(record->surname);
+    record->name = capitalize(record->name);
+    record->patronymic = capitalize(record->patronymic);
+}
+
+std::string phone_to_str(const unsigned long long int number) {
+    std::string buf;
+    int part1 = number / 10000000;
+    int part2 = number % 10000000;
+    int part3 = part2 % 10000;
+    part2 = part2 / 10000;
+    buf += std::to_string(part1 / 1000) + " (" + std::to_string(part1 % 1000) + ") ";
+    buf += std::to_string(part2) + " " + std::to_string(part3 / 100) + '-' + std::to_string(part3 % 100);
+    return buf;
+}
+
+unsigned long long int str_to_phone(const std::string& buf) {
+    const auto len = buf.length();
+    unsigned long long int num = 0;
+    for (size_t i = 0; i < len; i++) {
+        auto c = buf[i];
+        if (std::isdigit(c)) {
+            num *= 10;
+            num += c - '0';
+        }
+    }
+    return num;
 }
