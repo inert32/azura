@@ -8,7 +8,7 @@ endif()
 project(azura_proj)
 
 add_compile_definitions(AZ_VER_MAJOR=0)
-add_compile_definitions(AZ_VER_MINOR=4)
+add_compile_definitions(AZ_VER_MINOR=5)
 add_compile_definitions(AZ_VER_PATCH=0)
 
 add_executable(azura

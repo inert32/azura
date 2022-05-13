@@ -268,6 +268,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
         tmp.phone_number = old_data->phone_number;
     }
+    else tmp.phone_number = str_to_phone(buf);
 
     std::cout << "Role: ";
     std::getline(std::cin, buf);
