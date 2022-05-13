@@ -7,141 +7,143 @@
 #include "io.h"
 #include "base.h"
 
-template <>
+template<>
 bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
    std::string buf;
-	size_t left = 0, right = str.find(','), field = 0;
-	bool is_good = true;
-	try {
-		while (field < 7) {
-			buf = str.substr(left, right - left);
+    size_t left = 0, right = str.find(','), field = 0;
+    bool is_good = true;
+    try {
+        while (field < 7) {
+            buf = str.substr(left, right - left);
          buf = buf.substr(buf.find_first_not_of(' '));
-			if (buf.empty()) is_good = false;
-			switch (field) {
+            if (buf.empty()) is_good = false;
+            switch (field) {
          case 0:
-				t->metadata.id = std::stoull(buf);
-				break;
-			case 1:
-				t->surname = buf;
-				break;
-			case 2:
-				t->name = buf;
-				break;
-			case 3:
-				t->patronymic = buf;
-				break;
-			case 4:
-				t->passport_series = std::stoi(buf);
-				if (t->passport_series < 1000 || t->passport_series > 9999) is_good = false;
-				break;
-			case 5:
-				t->passport_number = std::stoi(buf);
-				if (t->passport_number < 100000 || t->passport_number > 999999) is_good = false;
-				break;
-			case 6:
-				t->phone_number = std::stoull(buf);
-				break;
-			default:
-				break;
-			}
-			field++;
-			left = right + 1;
-			right = str.find(',', right + 1);
-			if (right == -1) right = str.length();
-		}
-	}
-	catch (std::exception &e) { return false; }
-	return is_good;
+                t->metadata.id = std::stoull(buf);
+                break;
+            case 1:
+                t->surname = buf;
+                break;
+            case 2:
+                t->name = buf;
+                break;
+            case 3:
+                t->patronymic = buf;
+                break;
+            case 4:
+                t->passport_series = std::stoi(buf);
+                if (t->passport_series < 1000 || t->passport_series > 9999) is_good = false;
+                break;
+            case 5:
+                t->passport_number = std::stoi(buf);
+                if (t->passport_number < 100000 || t->passport_number > 999999) is_good = false;
+                break;
+            case 6:
+                t->phone_number = std::stoull(buf);
+                break;
+            default:
+                break;
+            }
+            field++;
+            left = right + 1;
+            right = str.find(',', right + 1);
+            if (right == -1) right = str.length();
+        }
+    }
+    catch (std::exception &e) { return false; }
+    return is_good;
 }
 
-template <>
+template<>
 bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
-   std::string buf;
-   size_t left = 0, right = str.find(','), field = 0;
-   bool is_good = true;
-   try {
-   while (field < 7) {
-			buf = str.substr(left, right - left);
-         buf = buf.substr(buf.find_first_not_of(' '));
-         if (buf.empty()) is_good = false;
-         switch (field) {
-         case 0:
-		   	t->metadata.id = std::stoull(buf);
-	   		break;
-         case 1:
-            t->town_from = buf;
+    std::string buf;
+    size_t left = 0, right = str.find(','), field = 0;
+    bool is_good = true;
+    try {
+        while (field < 7) {
+            buf = str.substr(left, right - left);
+            buf = buf.substr(buf.find_first_not_of(' '));
+            if (buf.empty()) is_good = false;
+            switch (field) {
+            case 0:
+                t->metadata.id = std::stoull(buf);
+                break;
+            case 1:
+                t->town_from = buf;
+                break;
+            case 2:
+                t->town_to = buf;
+                break;
+            case 3: {
+                date d(buf);
+                if (!(d.validate())) is_good = false;
+                break;
+            }
+            case 4: {
+                date d(buf);
+                if (!(d.validate()) is_good = false;
+                break;
+            }
+            case 5:
+                t->manager = std::stoll(buf);
+                break;
+            case 6: {
+                size_t count = 0;
+                parse_tourists_count(buf, &t->tourists);
+                break;
+            }
+            default:
             break;
-         case 2:
-            t->town_to = buf;
-            break;
-         case 3: {
-            date d(buf);
-            if (!(d.validate())) is_good = false;
-            break;
-         }
-         case 4: {
-            date d(buf);
-            if (!(d.validate() && d > t->date_start)) is_good = false;
-            break;
-         }
-         case 5:
-            t->manager = std::stoll(buf);
-            break;
-         case 6: {
-            size_t count = 0;
-            parse_tourists_count(buf, &t->tourists);
-            break;
-         }
-         default:
-            break;
-         }
-         field++;
-         left = right + 1;
-         right = str.find(',', right + 1);
-         if (right == -1) right = str.length();
-      }
-   }
-   catch (std::exception &e) { return false; }
-   return is_good;
+        }
+        field++;
+        left = right + 1;
+        right = str.find(',', right + 1);
+        if (right == -1) right = str.length();
+        }
+    }
+    catch (std::exception &e) { return false; }
+    return is_good;
 }
 
-template <>
+template<>
 bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
-   std::string buf;
-	size_t left = 0, right = str.find(','), field = 0;
-	bool is_good = true;
-	try {
-		while (field < 7) {
-			buf = str.substr(left, right - left);
-         buf = buf.substr(buf.find_first_not_of(' '));
-			if (buf.empty()) is_good = false;
-			switch (field) {
-         case 0:
-				t->metadata.id = std::stoull(buf);
-				break;
-			case 1:
-				t->surname = buf;
-				break;
-			case 2:
-				t->name = buf;
-				break;
-			case 3:
-				t->patronymic = buf;
-				break;
-			case 4:
-				t->phone_number = std::stoull(buf);
-				break;
-			default:
-				break;
-			}
-			field++;
-			left = right + 1;
-			right = str.find(',', right + 1);
-			if (right == str.npos) right = str.length();
-		}
-	}
-	catch (std::exception &e) { return false; }
-	return is_good;
+    std::string buf;
+    size_t left = 0, right = str.find(','), field = 0;
+    bool is_good = true;
+    try {
+        while (field < 7) {
+            buf = str.substr(left, right - left);
+            buf = buf.substr(buf.find_first_not_of(' '));
+            if (buf.empty()) is_good = false;
+            switch (field) {
+            case 0:
+                t->metadata.id = std::stoull(buf);
+                break;
+            case 1:
+                t->surname = buf;
+                break;
+            case 2:
+                t->name = buf;
+                break;
+            case 3:
+                t->patronymic = buf;
+                break;
+            case 4:
+                t->phone_number = std::stoull(buf);
+                break;
+            case 5:
+                t->role = std::stoi(buf);
+                break;
+            default: break;
+            }
+            field++;
+            left = right + 1;
+            right = str.find(',', right + 1);
+            if (right == str.npos) right = str.length();
+        }
+    }
+    catch (std::exception &e) { return false; }
+    return is_good;
 }
 
 const bool operator>(const date& d1, const date& d2) {
@@ -175,22 +177,21 @@ date::date(unsigned short new_day, unsigned short new_month, int new_year) {
 }
 
 void date::set(std::string str) {
-   // Switch to dots before parsing
-   const auto size = str.length();
-   for (size_t i = 0; i < size; i++)
-      if (str[i] == ',' || str[i] == ' ') str[i] = '.';
-   try {
+    // Switch to dots before parsing
+    const auto size = str.length();
+    for (size_t i = 0; i < size; i++)
+        if (str[i] == ',' || str[i] == ' ') str[i] = '.';
+    try {
+        const auto month_pos = str.find('.');
+        const auto year_pos = str.find('.', month_pos + 1);
 
-      const auto month_pos = str.find('.');
-      const auto year_pos = str.find('.', month_pos + 1);
-
-      day = std::stoi(str.substr(0, month_pos));
-      month = std::stoi(str.substr(month_pos + 1, year_pos));
-      year = std::stoi(str.substr(year_pos + 1, str.npos));
-   }
-   catch (const std::exception &e) {
-      day = 1; month = 1; year = 1980;
-   }
+        day = std::stoi(str.substr(0, month_pos));
+        month = std::stoi(str.substr(month_pos + 1, year_pos));
+        year = std::stoi(str.substr(year_pos + 1, str.npos));
+    }
+    catch (const std::exception &e) {
+        day = 1; month = 1; year = 1980;
+    }
 }
 
 void date::set(unsigned short new_day, unsigned short new_month, int new_year) {
@@ -212,4 +213,9 @@ bool date::validate() {
        return false;
     }
     return true;
+}
+
+template<>
+void checker<tourist_t>::check(tourist_t* record) {
+   
 }

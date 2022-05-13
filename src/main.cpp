@@ -13,6 +13,10 @@
 #include <iomanip>
 #include <limits>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include "base.h"
 #include "secure.h"
 
@@ -41,29 +45,34 @@ Backup before edit/remove   : no
 
 int main(int argc, char** argv) {
     auto ui = new min_ui();
-//    try {
+    try {
         auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute("tourists.txt"));
         auto tourists = new db_base<tourist_t>(tourists_io);
 
         auto tours_io = new file_io<tour_t>(std::filesystem::absolute("tours.txt"));
         auto tours = new db_base<tour_t>(tours_io);
+
+        auto employes_io = new file_io<employe_t>(std::filesystem::absolute("employes.txt"));
+        auto employes = new db_base<employe_t>(employes_io);
         
         std::cerr << "Main cycle\n";
 
-        while (ui->main(tourists, tours, nullptr)) {}
+        while (ui->main(tourists, tours, employes)) {}
         
         std::cerr << "Leaving" << std::endl;
         
         delete tourists;
         delete tours;
+        delete employes;
 
         delete tourists_io;
         delete tours_io;
-//   }
-//   catch (const std::exception &e) {
-//       ui->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
-//       return -1;
-//   }
+        delete employes_io;
+    }
+    catch (const std::exception &e) {
+       ui->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
+       return -1;
+    }
 
     return 0;
 }

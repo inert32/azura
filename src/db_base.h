@@ -4,7 +4,7 @@
 #include "base.h"
 #include "io.h"
 
-template <class T>
+template<class T>
 class db_base {
 public:
     db_base(io_base<T>* _io);
@@ -25,7 +25,7 @@ protected:
     io_base<T>* io;
 };
 
-template <class T>
+template<class T>
 db_base<T>::db_base(io_base<T>* _io) { 
     io = _io;
     while (true) {
@@ -36,28 +36,28 @@ db_base<T>::db_base(io_base<T>* _io) {
     }
 }
 
-template <class T>
+template<class T>
 db_base<T>::~db_base() {
     db_sync();
 }
 
-template <class T>
+template<class T>
 db_id_t db_base<T>::db_size() {
     return arr.size();
 }
 
-template <class T>
+template<class T>
 bool db_base<T>::db_sync() {
     for (auto &x : arr) io->write_record(&x);
     return true;
 }
 
-template <class T>
+template<class T>
 T* db_base<T>::record_get(const db_id_t id) {
     return (arr.empty()) ? nullptr : &(arr[id]);
 }
 
-template <class T>
+template<class T>
 bool db_base<T>::record_exists(const db_id_t id) {
     try {
         auto x = arr.at(id);
@@ -68,7 +68,7 @@ bool db_base<T>::record_exists(const db_id_t id) {
     return true;
 }
 
-template <class T>
+template<class T>
 bool db_base<T>::record_add(T* rec) {
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
@@ -76,13 +76,13 @@ bool db_base<T>::record_add(T* rec) {
     return true;
 }
 
-template <class T>
+template<class T>
 bool db_base<T>::record_del(db_id_t id) {
     arr.erase(arr.begin() + id);
     return true;
 }
 
-template <class T>
+template<class T>
 bool db_base<T>::record_edit(const T* rec, const db_id_t id) {
     arr[id] = *rec;
     //changed_records.push_back(id);

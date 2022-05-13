@@ -59,7 +59,8 @@ struct employe_t {
     std::string surname;
     std::string name;
     std::string patronymic;
-    unsigned int phone_number = 0;
+    unsigned long long int phone_number = 0;
+    unsigned short int role = 0;
 };
 
 #endif /* __BASE_H__ */

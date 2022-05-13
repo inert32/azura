@@ -92,7 +92,9 @@ bool file_io<employe_t>::write_record(const employe_t* rec) {
         file_handle.width(file_line_length);
         file_handle << rec->patronymic << ',';
         file_handle.width(file_line_length);
-        file_handle << rec->phone_number << std::endl;
+        file_handle << rec->phone_number << ',';
+        file_handle.width(file_line_length);
+        file_handle << rec->role << std::endl;
         file_handle.flush();
         return true;
     }

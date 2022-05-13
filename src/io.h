@@ -9,18 +9,18 @@
 constexpr unsigned int file_line_length = 64;
 
 enum class io_codes {
-	struct_complete,
-	struct_corrupt,
-	eof,
+    struct_complete,
+    struct_corrupt,
+    eof,
     denied
 };
 
 /* Code results:
-	* 0 - struct is complete
-	* 1 - struct is corrupt
-	* 2 - reached EOF
+    * 0 - struct is complete
+    * 1 - struct is corrupt
+    * 2 - reached EOF
     * 3 - access denied for this uid
-	*/
+    */
 
 template<class T>
 class io_base {
@@ -48,13 +48,12 @@ private:
     bool write_to_disk = false;
 };
 
-template <class T>
+template<class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
     _file_path = path;
 
     int tries = 0; // Trying three times to open file
     while (tries < 3) {
-        std::cerr << "Try " << tries + 1 << std::endl;
         file_handle.open(path, std::ios::in | std::ios::out | std::ios::binary);
         if (!file_handle.good()) {
             // Recreating file
@@ -81,12 +80,12 @@ io_codes file_io<T>::read_record(T* rec) {
     return (parser.parse(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
 }
 
-template <class T>
+template<class T>
 void file_io<T>::sync() {
     file_handle.flush();
 }
 
-template <class T>
+template<class T>
 file_io<T>::~file_io() {
     file_handle.close();
 }
