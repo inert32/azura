@@ -5,6 +5,7 @@
 #include "io.h"
 #include "parsers.h"
 #include "base.h"
+#include "secure.h"
 
 template<>
 bool file_io<tourist_t>::write_record(const tourist_t* rec) {

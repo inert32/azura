@@ -31,13 +31,6 @@
 
 /* TODO List
 tourist_ctl                 : 9/9 
-tours_ctl                   : 0/9
-employe_ctl                 : 0/9
-
-min_tui                     : 5/5
-
-io                          : 2/6
-parsers                     : 1/3
 
 DB recovery                 : no
 Backup before edit/remove   : no
@@ -54,12 +47,8 @@ int main(int argc, char** argv) {
 
         auto employes_io = new file_io<employe_t>(std::filesystem::absolute("employes.txt"));
         auto employes = new db_base<employe_t>(employes_io);
-        
-        std::cerr << "Main cycle\n";
 
         while (ui->main(tourists, tours, employes)) {}
-        
-        std::cerr << "Leaving" << std::endl;
         
         delete tourists;
         delete tours;

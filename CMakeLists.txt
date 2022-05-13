@@ -12,7 +12,7 @@ add_compile_definitions(AZ_VER_MINOR=4)
 add_compile_definitions(AZ_VER_PATCH=0)
 
 add_executable(azura
-src/main.cpp src/io.cpp src/parsers.cpp src/secure.cpp
+src/main.cpp src/base.cpp src/io.cpp src/parsers.cpp src/secure.cpp
 src/ui/ui_min.cpp src/locale.cpp
 
 src/base.h src/io.h src/parsers.h src/secure.h src/db_base.h
