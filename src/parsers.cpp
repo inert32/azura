@@ -170,7 +170,7 @@ unsigned long long int str_to_phone(const std::string& buf) {
     unsigned long long int num = 0;
     for (size_t i = 0; i < len; i++) {
         auto c = buf[i];
-        if (std::isdigit(c)) {
+        if (is_digit(c)) {
             num *= 10;
             num += c - '0';
         }

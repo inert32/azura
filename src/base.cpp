@@ -46,6 +46,8 @@ void date::set(std::string str) {
         day = std::stoi(str.substr(0, month_pos));
         month = std::stoi(str.substr(month_pos + 1, year_pos));
         year = std::stoi(str.substr(year_pos + 1, str.npos));
+
+        if (year < 2000) year += 2000;
     }
     catch (const std::exception &e) {
         day = 1; month = 1; year = 1980;
@@ -54,6 +56,7 @@ void date::set(std::string str) {
 
 void date::set(unsigned short new_day, unsigned short new_month, int new_year) {
     day = new_day; month = new_month; year = new_year;
+    if (year < 2000) year += 2000;
 }
 
 bool date::validate() {

@@ -2,6 +2,19 @@
 #define __PARSERS_H__
 #include "base.h"
 
+#ifdef _WIN32
+	#define is_letter(c) isalpha((unsigned char)(c))
+	#define is_digit(c)  isdigit((unsigned char)(c))
+	#define to_upper(c)  toupper((unsigned char)(c))
+	#define to_lower(c)  tolower((unsigned char)(c))
+#else
+	#define is_letter(c) std::isalpha((unsigned char)(c))
+	#define is_digit(c)  std::isdigit((unsigned char)(c))
+	#define to_upper(c)  std::toupper((unsigned char)(c))
+	#define to_lower(c)  std::tolower((unsigned char)(c))
+#endif
+
+
 template<class T>
 class parsers {
 public:
@@ -26,16 +39,16 @@ std::string prettify_records<T>::capitalize(const std::string& str) {
     bool word_end = true;
 
     for (size_t i = 0; i < len; i++) {
-        if (std::isalpha(str[i]) == 0) {
+        if (is_letter(str[i]) == 0) {
             word_end = true;
             new_string += str[i];
             continue;
         }
         if (word_end == true) {
             word_end = false;
-            new_string += std::toupper(str[i]);
+            new_string += to_upper(str[i]);
         }
-        else new_string += std::tolower(str[i]);
+        else new_string += to_lower(str[i]);
     }
     return new_string;
 }
