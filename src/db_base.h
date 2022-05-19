@@ -16,6 +16,8 @@ public:
     bool record_edit(const T* rec, const db_id_t id);
     bool record_exists(const db_id_t id);
 
+    //void sort(const int field)
+
     bool db_sync();
     
     db_id_t db_size();
@@ -84,6 +86,9 @@ bool db_base<T>::record_add(T* rec) {
 template<class T>
 bool db_base<T>::record_del(db_id_t id) {
     arr.erase(arr.begin() + id);
+    const size_t new_size = arr.size();
+    for (auto i = id; i < new_size; ++i)
+        arr[i].metadata.id = i;
     return true;
 }
 

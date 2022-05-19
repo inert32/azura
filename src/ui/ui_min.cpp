@@ -63,6 +63,7 @@ void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_get(i);
+        if (!(entry->metadata.allow && entry->metadata.show)) continue;
         std::cout << entry->metadata.id << '\t'
                   << entry->surname << '\t'
                   << entry->name << '\t'
@@ -85,6 +86,7 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_get(i);
+        if (!(entry->metadata.allow && entry->metadata.show)) continue;
         std::cout << entry->metadata.id << '\t'
                   << entry->town_from << '\t'
                   << entry->town_to << '\t'
@@ -108,6 +110,8 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_get(i);
+        if (!(entry->metadata.allow && entry->metadata.show)) continue;
+        if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id << '\t'
                   << entry->surname << '\t'
                   << entry->name << '\t'
