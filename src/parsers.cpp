@@ -154,6 +154,19 @@ void prettify_records<tourist_t>::prettyify(tourist_t* record) {
     record->patronymic = capitalize(record->patronymic);
 }
 
+template<>
+void prettify_records<tour_t>::prettyify(tour_t* record) {
+    record->town_from = capitalize(record->town_from);
+    record->town_to = capitalize(record->town_to);
+}
+
+template<>
+void prettify_records<employe_t>::prettyify(employe_t* record) {
+    record->surname = capitalize(record->surname);
+    record->name = capitalize(record->name);
+    record->patronymic = capitalize(record->patronymic);
+}
+
 std::string phone_to_str(const unsigned long long int number) {
     std::string buf;
     int part1 = number / 10000000;

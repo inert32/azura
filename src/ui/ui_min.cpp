@@ -12,6 +12,7 @@ min_ui::min_ui() {
     std::cout << "Azura v" << AZ_VER_MAJOR << '.' << AZ_VER_MINOR << '.' << AZ_VER_PATCH << std::endl;
     current = tables_list::tourists;
     #ifdef _WIN32
+    std::locale::global("Russian_Russia.1251");
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
     #endif
@@ -93,10 +94,28 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
                   << entry->town_from << '\t'
                   << entry->town_to << '\t'
                   << entry->date_start << '\t'
-                  << entry->date_end << '\t'
-                  << entry->manager << '\t';
+                  << entry->date_end << '\t';
+        auto manager = employes_ptr->record_get(entry->manager);
+        if (manager != nullptr)
+            std::cout << "(" << entry->manager << ") " 
+            << manager->surname << ' '
+            << manager->name    << ' ' 
+            << manager->patronymic << '\t';
+        else
+            std::cout << "(" << entry->manager << ") Unknown" << '\t';
+
         const auto count = entry->tourists.size();
-        for (size_t i = 0; i < count; i++) std::cout << entry->tourists[i] << ' ';
+        for (size_t i = 0; i < count; i++) {
+            auto t = tourists_ptr->record_get(i);
+            if (t != nullptr)
+                std::cout << "(" << i << ") " 
+                << t->surname << ' ' 
+                << t->name    << ' ' 
+                << t-> patronymic 
+                << "\n\t\t\t\t\t\t\t\t\t\t";
+            else
+                std::cout << "(" << i << ") Unknown";
+        }
         std::cout << std::endl;
     }
 }
@@ -238,6 +257,8 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
         parsers<tour_t> parser; 
         parser.parse_tourists_count(buf, &tmp.tourists);
     }
+    prettify_records<tour_t> pr;
+    pr.prettyify(&tmp);
     
     return tmp;
 }
@@ -286,10 +307,10 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
         tmp.role = old_data->role;
     }
     else {
-        int r;
-        std::cin >> r;
-        tmp.role.set(r);
+        tmp.role.set(std::stoi(buf));
     }
+    prettify_records<employe_t> pr;
+    pr.prettyify(&tmp);
     
     return tmp;
 }
