@@ -30,10 +30,13 @@ protected:
 template<class T>
 db_base<T>::db_base(io_base<T>* _io) { 
     io = _io;
+    db_id_t id = 0;
     while (true) {
         T tmp;
-        auto i = io->read_record(&tmp);
+        auto i = io->read_record(&tmp, id);
         if (i == io_codes::eof) break;
+		if (i == io_codes::struct_corrupt) tmp.metadata.corrupt = true;
+		id++;
         arr.push_back(tmp);
     }
 }
@@ -50,7 +53,9 @@ db_id_t db_base<T>::db_size() {
 
 template<class T>
 bool db_base<T>::db_sync() {
-    for (auto &x : arr) io->write_record(&x);
+    for (auto &x : arr) {
+		io->write_record(&x, x.metadata.id);
+	}
     return true;
 }
 

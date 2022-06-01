@@ -6,7 +6,7 @@
 #include "base.h"
 #include "locale.h"
 #include "parsers.h"
-constexpr unsigned int file_line_length = 64;
+constexpr unsigned int file_field_length = 64;
 
 enum class io_codes {
     struct_complete,
@@ -25,8 +25,8 @@ enum class io_codes {
 template<class T>
 class io_base {
 public:
-    virtual io_codes read_record(T* rec) = 0;
-    virtual bool write_record(const T* rec) = 0;
+    virtual io_codes read_record(T* rec, const db_id_t id = -1) = 0;
+    virtual bool write_record(const T* rec, const db_id_t id = -1) = 0;
 
     virtual void sync() = 0;
 };
@@ -37,15 +37,18 @@ public:
     file_io(const std::filesystem::path& path);
     ~file_io();
     
-    io_codes read_record(T* rec);
+    io_codes read_record(T* rec, const db_id_t id = -1);
 
-    bool write_record(const T* rec);
+    bool write_record(const T* rec, const db_id_t id = -1);
     
     void sync();
 private:
     std::filesystem::path _file_path;
     std::fstream file_handle;
     bool write_to_disk = false;
+
+    void seek_line(const db_id_t line);
+    void _write_rec(const T* rec);
 };
 
 template<class T>
@@ -69,15 +72,40 @@ file_io<T>::file_io(const std::filesystem::path& path) {
 }
 
 template<class T>
-io_codes file_io<T>::read_record(T* rec) {
+io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
+    if (id != -1) seek_line(id);
+
     std::string buf_str;
-
     std::getline(file_handle, buf_str);
-
     if (buf_str.empty()) return io_codes::eof;
-    parsers<T> parser;
 
+    parsers<T> parser;
     return (parser.parse(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
+}
+
+template<class T>
+bool file_io<T>::write_record(const T* rec, const db_id_t id) {
+	if (id != -1) seek_line(id);
+
+	if (file_handle.good()) {
+		_write_rec(rec);
+		file_handle << ';';
+		file_handle.flush();
+		return true;
+	}
+	else return false;
+}
+
+template<class T>
+void file_io<T>::seek_line(const db_id_t line) {
+	/* Offset creation rule: 
+	* 7*file_field_length - number of fields in *_t structs * length of field
+	* +7 - count of delims in line
+	*/
+	const auto off = line * (7 * file_field_length + 7);
+	file_handle.seekg(off);
+	file_handle.seekp(off);
+	file_handle.clear();
 }
 
 template<class T>
