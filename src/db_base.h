@@ -10,10 +10,10 @@ public:
     db_base(io_base<T>* _io);
     ~db_base();
 
-    T* record_get(const db_id_t id);
-    bool record_add(T* rec);
-    bool record_del(const db_id_t id);
-    bool record_edit(const T* rec, const db_id_t id);
+    bool record_create(T* rec);
+    T* record_read(const db_id_t id);
+    bool record_update(const T* rec, const db_id_t id);
+    bool record_delete(const db_id_t id);
     bool record_exists(const db_id_t id);
 
     //void sort(const int field)
@@ -60,7 +60,7 @@ bool db_base<T>::db_sync() {
 }
 
 template<class T>
-T* db_base<T>::record_get(const db_id_t id) {
+T* db_base<T>::record_read(const db_id_t id) {
     try {
         return &arr.at(id);
     }
@@ -81,7 +81,7 @@ bool db_base<T>::record_exists(const db_id_t id) {
 }
 
 template<class T>
-bool db_base<T>::record_add(T* rec) {
+bool db_base<T>::record_create(T* rec) {
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
     //changed_records.push_back(rec->metadata.id);
@@ -89,7 +89,7 @@ bool db_base<T>::record_add(T* rec) {
 }
 
 template<class T>
-bool db_base<T>::record_del(db_id_t id) {
+bool db_base<T>::record_delete(db_id_t id) {
     arr.erase(arr.begin() + id);
     const size_t new_size = arr.size();
     for (auto i = id; i < new_size; ++i)
@@ -98,7 +98,7 @@ bool db_base<T>::record_del(db_id_t id) {
 }
 
 template<class T>
-bool db_base<T>::record_edit(const T* rec, const db_id_t id) {
+bool db_base<T>::record_update(const T* rec, const db_id_t id) {
     arr[id] = *rec;
     //changed_records.push_back(id);
     return true;

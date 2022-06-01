@@ -12,9 +12,9 @@ enum class tables_list {
 };
 
 enum class ui_actions {
-    record_add,
-    record_edit,
-    record_del,
+    record_create,
+    record_update,
+    record_delete,
     switch_table,
     quit
 };
@@ -39,9 +39,9 @@ public:
     tables_list main(db_base<T>* table, const tables_list current);
 
 private:
-    void record_add(db_base<T>* table);
-    void record_edit(db_base<T>* table);
-    void record_del(db_base<T>* table);
+    void record_create(db_base<T>* table);
+    void record_update(db_base<T>* table);
+    void record_delete(db_base<T>* table);
     void table_print(db_base<T>* table);
 
     T create_record(T* old_data = nullptr);
@@ -90,14 +90,14 @@ tables_list min_ui_main<T>::main(db_base<T>* table, const tables_list current) {
     // Check that table here and table from set_tables() same
     table_print(table);
     switch (print_menu()) {
-    case ui_actions::record_add:
-        record_add(table);
+    case ui_actions::record_create:
+        record_create(table);
         break;
-    case ui_actions::record_edit:
-        record_edit(table);
+    case ui_actions::record_update:
+        record_update(table);
         break;
-    case ui_actions::record_del:
-        record_del(table);
+    case ui_actions::record_delete:
+        record_delete(table);
         break;
     case ui_actions::switch_table:
         return switch_table();
@@ -115,9 +115,9 @@ ui_actions min_ui_main<T>::print_menu() {
         char c = 0;
         std::cin >> c;
         switch (c) {
-            case '1': return ui_actions::record_add;
-            case '2': return ui_actions::record_edit;
-            case '3': return ui_actions::record_del;
+            case '1': return ui_actions::record_create;
+            case '2': return ui_actions::record_update;
+            case '3': return ui_actions::record_delete;
             case '9': return ui_actions::switch_table;
             case '0': return ui_actions::quit;
             default: break;
@@ -126,27 +126,27 @@ ui_actions min_ui_main<T>::print_menu() {
 }
 
 template<class T>
-void min_ui_main<T>::record_add(db_base<T>* table) {
+void min_ui_main<T>::record_create(db_base<T>* table) {
     auto rec = create_record();
-    table->record_add(&rec);
+    table->record_create(&rec);
 }
 
 template<class T>
-void min_ui_main<T>::record_edit(db_base<T>* table) {
+void min_ui_main<T>::record_update(db_base<T>* table) {
     std::cout << "Enter id: ";
     db_id_t id = 0;
     std::cin >> id;
-    auto old = table->record_get(id);
+    auto old = table->record_read(id);
     if (old != nullptr) {
         std::cout << "Type '-' to enter old value" << std::endl;
         auto rec = create_record(old);
-        table->record_edit(&rec, id);
+        table->record_update(&rec, id);
     }
     else std::cout << "No such record." << std::endl;
 }
 
 template<class T>
-void min_ui_main<T>::record_del(db_base<T>* table) {
+void min_ui_main<T>::record_delete(db_base<T>* table) {
     std::cout << "Enter id: ";
     db_id_t id = 0;
     std::cin >> id;
@@ -154,7 +154,7 @@ void min_ui_main<T>::record_del(db_base<T>* table) {
         std::cout << "Sure? (y/n) ";
         char c = 0;
         std::cin >> c;
-        if (tolower(c) == 'y') table->record_del(id);
+        if (tolower(c) == 'y') table->record_delete(id);
         else std::cout << "Removal canceled" << std::endl;
     }
     else std::cout << "No such record." << std::endl;

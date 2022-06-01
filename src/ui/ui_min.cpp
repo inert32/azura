@@ -10,7 +10,7 @@
 
 min_ui::min_ui() {
     std::cout << "Azura v" << AZ_VER_MAJOR << '.' << AZ_VER_MINOR << '.' << AZ_VER_PATCH << std::endl;
-    current = tables_list::tourists;
+    current = tables_list::tours;
     #ifdef _WIN32
     std::locale::global("Russian_Russia.1251");
     SetConsoleCP(1251);
@@ -63,7 +63,7 @@ void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
               << "Phone number" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
-        auto entry = table->record_get(i);
+        auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id << '\t'
@@ -87,7 +87,7 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
               << "Tourists" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
-        auto entry = table->record_get(i);
+        auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id << '\t'
@@ -95,7 +95,7 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
                   << entry->town_to << '\t'
                   << entry->date_start << '\t'
                   << entry->date_end << '\t';
-        auto manager = employes_ptr->record_get(entry->manager);
+        auto manager = employes_ptr->record_read(entry->manager);
         if (manager != nullptr)
             std::cout << "(" << entry->manager << ") " 
             << manager->surname << ' '
@@ -106,7 +106,7 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
 
         const auto count = entry->tourists.size();
         for (size_t i = 0; i < count; i++) {
-            auto t = tourists_ptr->record_get(i);
+            auto t = tourists_ptr->record_read(i);
             if (t != nullptr)
                 std::cout << "(" << i << ") " 
                 << t->surname << ' ' 
@@ -130,7 +130,7 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
               << "Role" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
-        auto entry = table->record_get(i);
+        auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id << '\t'
