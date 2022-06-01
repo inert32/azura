@@ -39,14 +39,20 @@ Backup before edit/remove   : no
 int main(int argc, char** argv) {
     auto ui = new min_ui();
     try {
+        auto employes_io = new file_io<employe_t>(std::filesystem::absolute("employes.txt"));
+        secure = new secure_ctl(employes_io);
+        if (secure->need_admin()) ui->adduser(employes_io);
+		else if (!ui->login()) {
+			std::cout << "Login failed." << std::endl;
+			return -1;
+		}
+        auto employes = new db_base<employe_t>(employes_io);
+
         auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute("tourists.txt"));
         auto tourists = new db_base<tourist_t>(tourists_io);
 
         auto tours_io = new file_io<tour_t>(std::filesystem::absolute("tours.txt"));
         auto tours = new db_base<tour_t>(tours_io);
-
-        auto employes_io = new file_io<employe_t>(std::filesystem::absolute("employes.txt"));
-        auto employes = new db_base<employe_t>(employes_io);
 
         while (ui->main(tourists, tours, employes)) {}
         

@@ -8,6 +8,11 @@
 #include "../db_base.h"
 #include "../secure.h"
 
+void _clean_input_buffer() {
+	std::cin.seekg(0, std::ios::end);
+	std::cin.clear();
+}
+
 min_ui::min_ui() {
     std::cout << "Azura v" << AZ_VER_MAJOR << '.' << AZ_VER_MINOR << '.' << AZ_VER_PATCH << std::endl;
     current = tables_list::tours;
@@ -50,6 +55,25 @@ bool min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<
             break;
     }
     return true;
+}
+
+bool min_ui::login() {
+    if (secure->need_login()) return true;
+    std::string input;
+    db_id_t new_uid;
+
+    std::cout << "Enter your ID: ";
+    std::cin >> input;
+    try {
+        new_uid = std::stoull(input);
+    }
+    catch (const std::exception& e) {
+        std::cout << "Not an UID." << std::endl;
+        return false;
+    }
+    std::cout << "Enter your password: ";
+    std::cin >> input;
+    return secure->login(new_uid, input);
 }
 
 template<>
@@ -142,6 +166,8 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
     }
 }
 
+#define restore_old_value (buf == "-" && old_data != nullptr)
+
 template<>
 tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     _clean_input_buffer();
@@ -149,7 +175,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     std::string buf;
     std::cout << "Surname: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->surname << std::endl;
         tmp.surname = old_data->surname;
     }
@@ -157,7 +183,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     
     std::cout << "Name: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->name << std::endl;
         tmp.name = old_data->name;
     }
@@ -165,7 +191,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     
     std::cout << "Patronymic: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->patronymic << std::endl;
         tmp.patronymic = old_data->patronymic;
     }
@@ -173,7 +199,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     
     std::cout << "Passport series: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->passport_series << std::endl;
         tmp.passport_series = old_data->passport_series;
     }
@@ -181,7 +207,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     
     std::cout << "Passport number: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->passport_number << std::endl;
         tmp.passport_number = old_data->passport_number;
     }
@@ -189,7 +215,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     
     std::cout << "Phone number: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
         tmp.phone_number = old_data->phone_number;
     }
@@ -208,7 +234,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
 
     std::cout << "Town from: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->town_from << std::endl;
         tmp.town_from = old_data->town_from;
     }
@@ -216,7 +242,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     
     std::cout << "Town to: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->town_to << std::endl;
         tmp.town_to = old_data->town_to;
     }
@@ -224,7 +250,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     
     std::cout << "Start date: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->date_start << std::endl;
         tmp.date_start = old_data->date_start;
     }
@@ -232,7 +258,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     
     std::cout << "End date: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->date_end << std::endl;
         tmp.date_end = old_data->date_end;
     }
@@ -240,16 +266,15 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     
     std::cout << "Manager: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->manager << std::endl;
         tmp.manager = old_data->manager;
     }
     else tmp.manager = std::stoull(buf);
     
-    //_clean_input_buffer();
     std::cout << "ids of tourists (divide by commas): ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field unchanged" << std::endl;
         tmp.tourists = old_data->tourists;
     }
@@ -265,12 +290,12 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
 
 template<>
 employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
-    _clean_input_buffer();
+    //_clean_input_buffer();
     employe_t tmp;
     std::string buf;
     std::cout << "Surname: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->surname << std::endl;
         tmp.surname = old_data->surname;
     }
@@ -278,7 +303,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     
     std::cout << "Name: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->name << std::endl;
         tmp.name = old_data->name;
     }
@@ -286,7 +311,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     
     std::cout << "Patronymic: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->patronymic << std::endl;
         tmp.patronymic = old_data->patronymic;
     }
@@ -294,7 +319,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     
     std::cout << "Phone number: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
         tmp.phone_number = old_data->phone_number;
     }
@@ -302,15 +327,31 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
 
     std::cout << "Role: ";
     std::getline(std::cin, buf);
-    if (buf == "-") {
+    if (restore_old_value) {
         std::cout << "Field stays at " << role_pretty(old_data->role) << std::endl;
         tmp.role = old_data->role;
     }
     else {
         tmp.role = (roles_enum)std::stoi(buf);
     }
+
+    std::cout << "Password: ";
+    std::cin >> buf;
+    if (restore_old_value) {
+        std::cout << "Field stays at " << old_data->passwd << std::endl;
+        tmp.passwd = old_data->passwd;
+    }
+    else tmp.passwd = buf;
     prettify_records<employe_t> pr;
     pr.prettyify(&tmp);
     
     return tmp;
+}
+
+bool min_ui::adduser(io_base<employe_t>* employes) {
+    std::cout << "Create new user: " << std::endl;
+    auto ui = new min_ui_main<employe_t>;
+    employe_t reg = ui->create_record();
+    reg.role = roles_enum::chief;
+    return secure->useradd(&reg);
 }

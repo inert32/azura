@@ -27,6 +27,9 @@ public:
     bool main(db_base<tourist_t>* tourists, 
               db_base<tour_t>* tours,
               db_base<employe_t>* employes);
+    
+    bool login();
+    bool adduser(io_base<employe_t>* employes);
 
 private:
     tables_list current;
@@ -37,6 +40,7 @@ class min_ui_main {
 public:
     void set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes);
     tables_list main(db_base<T>* table, const tables_list current);
+    T create_record(T* old_data = nullptr);
 
 private:
     void record_create(db_base<T>* table);
@@ -44,7 +48,6 @@ private:
     void record_delete(db_base<T>* table);
     void table_print(db_base<T>* table);
 
-    T create_record(T* old_data = nullptr);
     ui_actions print_menu();
     tables_list switch_table();
 

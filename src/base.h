@@ -70,6 +70,7 @@ struct employe_t {
     std::string patronymic;
     unsigned long long int phone_number = 0;
     roles_enum role = roles_enum::guide;
+    std::string passwd;
 };
 
 #endif /* __BASE_H__ */

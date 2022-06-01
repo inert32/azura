@@ -29,6 +29,7 @@ public:
     virtual bool write_record(const T* rec, const db_id_t id = -1) = 0;
 
     virtual void sync() = 0;
+    virtual bool is_empty() = 0;
 };
 
 template<class T>
@@ -38,10 +39,10 @@ public:
     ~file_io();
     
     io_codes read_record(T* rec, const db_id_t id = -1);
-
     bool write_record(const T* rec, const db_id_t id = -1);
     
     void sync();
+    bool is_empty();
 private:
     std::filesystem::path _file_path;
     std::fstream file_handle;
@@ -50,6 +51,15 @@ private:
     void seek_line(const db_id_t line);
     void _write_rec(const T* rec);
 };
+
+template<class T>
+bool file_io<T>::is_empty() {
+	seek_line(0);
+	auto c = file_handle.peek();
+	bool eof = file_handle.eof();
+	if (eof) file_handle.clear();
+    return eof;
+}
 
 template<class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
