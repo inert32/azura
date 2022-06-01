@@ -133,7 +133,7 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
                 t->phone_number = std::stoull(buf);
                 break;
             case 5:
-                t->role.set(std::stoi(buf));
+                t->role = (roles_enum)std::stoi(buf);
                 break;
             default: break;
             }

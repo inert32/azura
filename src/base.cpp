@@ -76,29 +76,11 @@ bool date::validate() {
     return true;
 }
 
-std::string roles::pretty() {
-    switch (user_role) {
-        case guide:   return "Guide";
-        case manager: return "Manager";
-        case chief:   return "Chief";
-        default:      return "Guide";
-    }
-}
-void roles::set(const int role) {
+std::string role_pretty(const roles_enum role) {
     switch (role) {
-        case 0:  user_role = guide; break;
-        case 1:  user_role = manager; break;
-        case 2:  user_role = chief; break;
-        default: user_role = guide; break;
+        case roles_enum::guide:   return "Guide";
+        case roles_enum::manager: return "Manager";
+        case roles_enum::chief:   return "Chief";
+        default:                  return "Guide";
     }
-}
-
-std::ostream& operator<<(std::ostream& out, const roles& role) {
-    switch (role.user_role) {
-        case role.guide:   out << 0; break;
-        case role.manager: out << 1; break;
-        case role.chief:   out << 2; break;
-        default:           out << 0; break;
-    }
-    return out;
 }

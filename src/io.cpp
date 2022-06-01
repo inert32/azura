@@ -90,7 +90,7 @@ void file_io<employe_t>::_write_rec(const employe_t* rec) {
             file_handle << rec->phone_number << ',';
             break;
         case 5:
-            file_handle << rec->role << ',';
+            file_handle << (int)rec->role << ',';
             break;
         //case 6: password
         }

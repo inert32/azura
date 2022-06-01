@@ -5,10 +5,6 @@
 
 extern db_id_t uid;
 
-std::string rid_to_text(const roles role);
-roles int_to_rid(const int role);
-int rid_to_int(const roles role);
-
 /* Roles:
  * |---------------+---------+------------+-------------------+-----------|
  * | Role          | Role ID | tourist_t  | tour_t            | employe_t |

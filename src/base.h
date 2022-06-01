@@ -9,18 +9,13 @@
 
 typedef unsigned long long int db_id_t;
 
-class roles {
-public:
-    std::string pretty();
-    void set(const int role);
-    friend std::ostream& operator<<(std::ostream& out, const roles& role);
-private:
-    enum _roles_enum {
-        guide,
-        manager,
-        chief
-    } user_role = guide;
+enum class roles_enum {
+    guide,
+    manager,
+    chief
 };
+
+std::string role_pretty(const roles_enum role);
 
 class date {
 public:
@@ -74,7 +69,7 @@ struct employe_t {
     std::string name;
     std::string patronymic;
     unsigned long long int phone_number = 0;
-    roles role;
+    roles_enum role = roles_enum::guide;
 };
 
 #endif /* __BASE_H__ */

@@ -138,7 +138,7 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
                   << entry->name << '\t'
                   << entry->patronymic << '\t'
                   << phone_to_str(entry->phone_number) << '\t'
-                  << entry->role.pretty() << std::endl;
+                  << role_pretty(entry->role) << std::endl;
     }
 }
 
@@ -303,11 +303,11 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     std::cout << "Role: ";
     std::getline(std::cin, buf);
     if (buf == "-") {
-        std::cout << "Field stays at " << old_data->role.pretty() << std::endl;
+        std::cout << "Field stays at " << role_pretty(old_data->role) << std::endl;
         tmp.role = old_data->role;
     }
     else {
-        tmp.role.set(std::stoi(buf));
+        tmp.role = (roles_enum)std::stoi(buf);
     }
     prettify_records<employe_t> pr;
     pr.prettyify(&tmp);
