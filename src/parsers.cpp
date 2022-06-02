@@ -135,6 +135,9 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
             case 5:
                 t->role = (roles_enum)std::stoi(buf);
                 break;
+            case 6:
+                t->passwd = buf;
+                break;
             default: break;
             }
             field++;

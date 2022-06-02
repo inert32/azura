@@ -48,7 +48,7 @@ private:
     std::fstream file_handle;
     bool write_to_disk = false;
 
-    void seek_line(const db_id_t line);
+    bool seek_line(const db_id_t line);
     void _write_rec(const T* rec);
 };
 
@@ -83,19 +83,28 @@ file_io<T>::file_io(const std::filesystem::path& path) {
 
 template<class T>
 io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
-    if (id != -1) seek_line(id);
+    std::cerr << "read_record(): load record " << id << std::endl;
+    if (id != -1) 
+        if (!seek_line(id)) return io_codes::eof;
 
     std::string buf_str;
-    std::getline(file_handle, buf_str);
-    if (buf_str.empty()) return io_codes::eof;
-
+    std::getline(file_handle, buf_str, ';');
+    std::cout << "read_record(): length " << buf_str.length() << std::endl; 
+    std::cout << buf_str << std::endl;
+ 
+    if (buf_str.empty()) {
+		seek_line(0);
+        return io_codes::eof;
+    }
     parsers<T> parser;
     return (parser.parse(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
 }
 
 template<class T>
 bool file_io<T>::write_record(const T* rec, const db_id_t id) {
-	if (id != -1) seek_line(id);
+    std::cerr << "read_record(): save record " << id << std::endl;
+	if (id != -1) 
+        if (!seek_line(id)) return false;
 
 	if (file_handle.good()) {
 		_write_rec(rec);
@@ -107,15 +116,16 @@ bool file_io<T>::write_record(const T* rec, const db_id_t id) {
 }
 
 template<class T>
-void file_io<T>::seek_line(const db_id_t line) {
+bool file_io<T>::seek_line(const db_id_t line) {
 	/* Offset creation rule: 
 	* 7*file_field_length - number of fields in *_t structs * length of field
 	* +7 - count of delims in line
 	*/
 	const auto off = line * (7 * file_field_length + 7);
+    std::cout << "seek_line(): offset " << off << std::endl;
 	file_handle.seekg(off);
 	file_handle.seekp(off);
-	file_handle.clear();
+	return file_handle.good();
 }
 
 template<class T>
