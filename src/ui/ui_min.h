@@ -1,8 +1,8 @@
 #ifndef __UI_MIN_H__
 #define __UI_MIN_H__
 
-#include <limits>
 #include "../db_base.h"
+#include "../config.h"
 
 enum class tables_list {
     tourists,

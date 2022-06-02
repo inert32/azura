@@ -20,7 +20,6 @@ db_id_t secure_ctl::get_uid() {
 bool secure_ctl::login(const db_id_t id, const std::string& passwd) {
     employe_t buf;
 	auto i = _io->read_record(&buf, id);
-    std::cout << (int)i << std::endl;
 	if (i != io_codes::struct_complete) return false;
 
     if (buf.metadata.id == id && buf.passwd == passwd) {

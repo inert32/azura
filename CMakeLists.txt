@@ -9,13 +9,15 @@ project(azura_proj)
 
 add_compile_definitions(AZ_VER_MAJOR=0)
 add_compile_definitions(AZ_VER_MINOR=5)
-add_compile_definitions(AZ_VER_PATCH=4)
+add_compile_definitions(AZ_VER_PATCH=5)
 
 add_executable(azura
-src/main.cpp src/base.cpp src/io.cpp src/parsers.cpp src/secure.cpp
+src/main.cpp src/base.cpp src/secure.cpp
+src/io.cpp src/parsers.cpp 
 src/ui/ui_min.cpp src/locale.cpp
 
-src/base.h src/io.h src/parsers.h src/secure.h src/db_base.h
+src/base.h src/secure.h src/db_base.h src/config.h
+src/io.h src/parsers.h 
 src/ui/ui_min.h src/locale.h)
 
 target_compile_features(azura PUBLIC cxx_std_17)

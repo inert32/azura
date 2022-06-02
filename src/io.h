@@ -83,14 +83,11 @@ file_io<T>::file_io(const std::filesystem::path& path) {
 
 template<class T>
 io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
-    std::cerr << "read_record(): load record " << id << std::endl;
     if (id != -1) 
         if (!seek_line(id)) return io_codes::eof;
 
     std::string buf_str;
     std::getline(file_handle, buf_str, ';');
-    std::cout << "read_record(): length " << buf_str.length() << std::endl; 
-    std::cout << buf_str << std::endl;
  
     if (buf_str.empty()) {
 		seek_line(0);
@@ -102,7 +99,6 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
 
 template<class T>
 bool file_io<T>::write_record(const T* rec, const db_id_t id) {
-    std::cerr << "read_record(): save record " << id << std::endl;
 	if (id != -1) 
         if (!seek_line(id)) return false;
 
@@ -122,7 +118,6 @@ bool file_io<T>::seek_line(const db_id_t line) {
 	* +7 - count of delims in line
 	*/
 	const auto off = line * (7 * file_field_length + 7);
-    std::cout << "seek_line(): offset " << off << std::endl;
 	file_handle.seekg(off);
 	file_handle.seekp(off);
 	return file_handle.good();

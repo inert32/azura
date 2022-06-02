@@ -39,8 +39,6 @@ public:
 	bool check_access(const db_id_t id, const crud_actions);
 };
 
-extern secure_ctl* secure;
-
 /* Roles:
  * |---------------+---------+------------+-------------------+-----------|
  * | Role          | Role ID | tourist_t  | tour_t            | employe_t |

@@ -19,6 +19,7 @@
 
 #include "base.h"
 #include "secure.h"
+#include "config.h"
 
 #include "io.h"
 #include "parsers.h"
@@ -37,9 +38,10 @@ Backup before edit/remove   : no
 */
 
 int main(int argc, char** argv) {
+    parse_cli(argc, argv);
     auto ui = new min_ui();
     try {
-        auto employes_io = new file_io<employe_t>(std::filesystem::absolute("employes.txt"));
+        auto employes_io = new file_io<employe_t>(std::filesystem::absolute(employes_file_path));
         secure = new secure_ctl(employes_io);
         if (secure->need_admin()) ui->adduser(employes_io);
 		else if (!ui->login()) {
@@ -48,10 +50,10 @@ int main(int argc, char** argv) {
 		}
         auto employes = new db_base<employe_t>(employes_io);
 
-        auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute("tourists.txt"));
+        auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute(tourists_file_path));
         auto tourists = new db_base<tourist_t>(tourists_io);
 
-        auto tours_io = new file_io<tour_t>(std::filesystem::absolute("tours.txt"));
+        auto tours_io = new file_io<tour_t>(std::filesystem::absolute(tours_file_path));
         auto tours = new db_base<tour_t>(tours_io);
 
         while (ui->main(tourists, tours, employes)) {}
@@ -71,3 +73,9 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+
+std::filesystem::path tourists_file_path = "tourists.txt";
+std::filesystem::path tours_file_path = "tours.txt";
+std::filesystem::path employes_file_path = "employes.txt";
+
+void parse_cli(int argc, char** argv) {}
