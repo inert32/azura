@@ -1,6 +1,12 @@
 #ifndef __UI_MIN_H__
 #define __UI_MIN_H__
 
+#include <iostream>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
+#include "../secure.h"
 #include "../db_base.h"
 #include "../config.h"
 

@@ -16,14 +16,11 @@ public:
     bool record_delete(const db_id_t id);
     bool record_exists(const db_id_t id);
 
-    //void sort(const int field)
-
     bool db_sync();
     
     db_id_t db_size();
 protected:
     std::vector<T> arr;
-    //std::vector<db_id_t> changed_records;
     io_base<T>* io;
 };
 
@@ -84,7 +81,6 @@ template<class T>
 bool db_base<T>::record_create(T* rec) {
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
-    //changed_records.push_back(rec->metadata.id);
     return true;
 }
 
@@ -100,7 +96,6 @@ bool db_base<T>::record_delete(db_id_t id) {
 template<class T>
 bool db_base<T>::record_update(const T* rec, const db_id_t id) {
     arr[id] = *rec;
-    //changed_records.push_back(id);
     return true;
 }
 

@@ -2,10 +2,8 @@
 #define __BASE_H__
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include "locale.h"
 
 typedef unsigned long long int db_id_t;
 

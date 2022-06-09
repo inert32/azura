@@ -1,12 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-#include <iostream>
-#ifdef _WIN32
-#include <Windows.h>
-#endif
 #include "ui_min.h"
-#include "../db_base.h"
-#include "../secure.h"
 
 void _clean_input_buffer() {
 	std::cin.seekg(0, std::ios::end);
@@ -352,6 +346,7 @@ bool min_ui::adduser(io_base<employe_t>* employes) {
     std::cout << "Create new user: " << std::endl;
     auto ui = new min_ui_main<employe_t>;
     employe_t reg = ui->create_record();
+    delete ui;
     reg.role = roles_enum::chief;
     return secure->useradd(&reg);
 }

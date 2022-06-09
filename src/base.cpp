@@ -3,7 +3,6 @@
 
 #include "base.h"
 
-
 const bool operator>(const date& d1, const date& d2) {
     if (d1.year > d2.year) return false;
     if (d1.month > d2.month) return false;

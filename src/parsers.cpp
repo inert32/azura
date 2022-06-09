@@ -1,25 +1,19 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-#include <string>
-#include <iostream>
-
 #include "parsers.h"
-#include "io.h"
-#include "base.h"
-#include "secure.h"
 
 template<>
 bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
-   std::string buf;
+    std::string buf;
     size_t left = 0, right = str.find(','), field = 0;
     bool is_good = true;
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-         buf = buf.substr(buf.find_first_not_of(' '));
+            buf = buf.substr(buf.find_first_not_of(' '));
             if (buf.empty()) is_good = false;
             switch (field) {
-         case 0:
+            case 0:
                 t->metadata.id = std::stoull(buf);
                 break;
             case 1:
@@ -33,11 +27,9 @@ bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
                 break;
             case 4:
                 t->passport_series = std::stoi(buf);
-                if (t->passport_series < 1000 || t->passport_series > 9999) is_good = false;
                 break;
             case 5:
                 t->passport_number = std::stoi(buf);
-                if (t->passport_number < 100000 || t->passport_number > 999999) is_good = false;
                 break;
             case 6:
                 t->phone_number = std::stoull(buf);

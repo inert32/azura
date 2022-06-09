@@ -4,9 +4,9 @@
 #include <iostream>
 #include <filesystem>
 #include "base.h"
-#include "locale.h"
 #include "parsers.h"
-constexpr unsigned int file_field_length = 64;
+
+constexpr unsigned int file_field_length = 128;
 
 enum class io_codes {
     struct_complete,
@@ -87,7 +87,7 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
         if (!seek_line(id)) return io_codes::eof;
 
     std::string buf_str;
-    std::getline(file_handle, buf_str, ';');
+    std::getline(file_handle, buf_str);
  
     if (buf_str.empty()) {
 		seek_line(0);
@@ -99,12 +99,11 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
 
 template<class T>
 bool file_io<T>::write_record(const T* rec, const db_id_t id) {
-	if (id != -1) 
-        if (!seek_line(id)) return false;
+	if (id != -1) seek_line(id);
 
 	if (file_handle.good()) {
 		_write_rec(rec);
-		file_handle << ';';
+		file_handle << std::endl;
 		file_handle.flush();
 		return true;
 	}
@@ -120,6 +119,7 @@ bool file_io<T>::seek_line(const db_id_t line) {
 	const auto off = line * (7 * file_field_length + 7);
 	file_handle.seekg(off);
 	file_handle.seekp(off);
+    file_handle.clear();
 	return file_handle.good();
 }
 

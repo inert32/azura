@@ -1,11 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-#include <fstream>
-#include <filesystem>
 #include "io.h"
-#include "parsers.h"
-#include "base.h"
-#include "secure.h"
 
 template<>
 void file_io<tourist_t>::_write_rec(const tourist_t* rec) {

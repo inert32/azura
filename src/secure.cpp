@@ -1,8 +1,6 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
-#include "base.h"
-#include "io.h"
 #include "secure.h"
 
 secure_ctl* secure = nullptr;
@@ -11,6 +9,7 @@ secure_ctl::secure_ctl(io_base<employe_t>* io) {
     _io = io;
     logged_in = false;
     uid = -1;
+    rid = roles_enum::guide;
 }
 
 db_id_t secure_ctl::get_uid() {

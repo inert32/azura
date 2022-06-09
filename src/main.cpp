@@ -3,15 +3,9 @@
 
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <vector>
 #include <filesystem>
 #include <string>
-#include <cstring>
-#include <sstream>
-#include <stdexcept>
-#include <iomanip>
-#include <limits>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -70,6 +64,9 @@ int main(int argc, char** argv) {
        ui->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
        return -1;
     }
+
+    delete ui;
+    delete secure;
 
     return 0;
 }
