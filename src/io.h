@@ -6,7 +6,7 @@
 #include "base.h"
 #include "parsers.h"
 
-constexpr unsigned int file_field_length = 128;
+constexpr unsigned int file_field_length = 32;
 
 enum class io_codes {
     struct_complete,
@@ -88,9 +88,9 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
 
     std::string buf_str;
     std::getline(file_handle, buf_str);
- 
+    
     if (buf_str.empty()) {
-		seek_line(0);
+        seek_line(0);
         return io_codes::eof;
     }
     parsers<T> parser;

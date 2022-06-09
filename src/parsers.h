@@ -55,16 +55,15 @@ std::string prettify_records<T>::capitalize(const std::string& str) {
 
 template<class T>
 void parsers<T>::parse_tourists_count(const std::string &str, std::vector<db_id_t>* list) {
-    size_t left = 0, right = str.find(',');
+    size_t left = 0, right = str.find(';');
+    const auto len = str.length();
     while (true) {
-        if (left > right) break;
         std::string buf = str.substr(left, right - left);
         if (!buf.empty()) list->push_back(std::stoull(buf));
-        else break; // Stop if there is no more values
-
         left = right + 1;
-        right = str.find(',', right + 1);
-        if (right == str.npos) right = str.length();
+        if (left > len) break;
+        right = str.find(';', left);
+        if (right == str.npos) right = len;
     }
 }
 

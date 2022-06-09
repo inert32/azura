@@ -17,7 +17,7 @@ const bool operator<(const date& d1, const date& d2) {
 }
 
 std::ostream& operator<<(std::ostream& out, const date& date) {
-    out << date.day << '.' << date.month << '.' << date.year;
+    out << std::to_string(date.day) + '.' + std::to_string(date.month) + '.' + std::to_string(date.year);
     return out;
 }
 

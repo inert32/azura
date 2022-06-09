@@ -34,7 +34,7 @@ void file_io<tourist_t>::_write_rec(const tourist_t* rec) {
 
 template<>
 void file_io<tour_t>::_write_rec(const tour_t* rec) {
-	for (int field = 0; field < 6; field++) {
+	for (int field = 0; field < 7; field++) {
 		file_handle.width(file_field_length);
 		switch (field) {
 		case 0:
@@ -52,12 +52,17 @@ void file_io<tour_t>::_write_rec(const tour_t* rec) {
 		case 4:
 			file_handle << rec->date_end << ',';
 			break;
-		case 5: {
+		case 5:
+			file_handle << rec->manager << ',';
+			break;
+		case 6: {
 			const auto count = rec->tourists.size();
+			std::string out;
 			for (size_t i = 0; i < count; i++) {
-				file_handle << rec->tourists[i];
-				if (i + 1 < count) file_handle << ',';
+				out += std::to_string(rec->tourists[i]);
+				if (i + 1 < count) out += ';';
 			}
+			file_handle << out;
 			break;
 		}
 		}

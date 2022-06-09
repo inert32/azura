@@ -266,13 +266,14 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     }
     else tmp.manager = std::stoull(buf);
     
-    std::cout << "ids of tourists (divide by commas): ";
+    std::cout << "ids of tourists (divide by semicolons): ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field unchanged" << std::endl;
         tmp.tourists = old_data->tourists;
     }
     else {
+        for (auto &c : buf) if (c == ',' || c == ' ') c = ';';
         parsers<tour_t> parser; 
         parser.parse_tourists_count(buf, &tmp.tourists);
     }
