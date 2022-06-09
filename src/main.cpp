@@ -20,7 +20,7 @@
 
 #include "db_base.h"
 
-#include "ui/ui_min.h"
+#include "ui/ui.h"
 
 #include "locale.h"
 
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         auto tours_io = new file_io<tour_t>(std::filesystem::absolute(tours_file_path));
         auto tours = new db_base<tour_t>(tours_io);
 
-        while (ui->main(tourists, tours, employes)) {}
+        ui->main(tourists, tours, employes);
         
         delete tourists;
         delete tours;

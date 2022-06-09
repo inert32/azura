@@ -1,6 +1,8 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-#include "ui_min.h"
+#include "ui.h"
+
+#ifdef AZ_USE_MIN_UI
 
 void _clean_input_buffer() {
 	std::cin.seekg(0, std::ios::end);
@@ -17,38 +19,43 @@ min_ui::min_ui() {
     #endif
 }
 
-void min_ui::msg(const std::string& msg) {
-    std::cout << msg << std::endl;
+void min_ui::msg(const std::string& body) {
+    std::cout << body << std::endl;
+}
+void min_ui::msg(const std::string& body, const std::string& head) {
+    std::cout << head << std::endl << body << std::endl;
 }
 
-bool min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
-    switch (current) {
-        case tables_list::tourists: {
-            auto ui = new min_ui_main<tourist_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(tourists, current);
-            delete ui;
-            break;
+void min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
+    bool run = true;
+    while (run) {
+        switch (current) {
+            case tables_list::tourists: {
+                auto ui = new min_ui_main<tourist_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(tourists, current);
+                delete ui;
+                break;
+            }
+            case tables_list::tours: {
+                auto ui = new min_ui_main<tour_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(tours, current);
+                delete ui;
+                break;
+            }
+            case tables_list::employes: {
+                auto ui = new min_ui_main<employe_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(employes, current);
+                delete ui;
+                break;
+            }
+            case tables_list::_quit:
+                run = false;
+                break;
         }
-        case tables_list::tours: {
-            auto ui = new min_ui_main<tour_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(tours, current);
-            delete ui;
-            break;
-        }
-        case tables_list::employes: {
-            auto ui = new min_ui_main<employe_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(employes, current);
-            delete ui;
-            break;
-        }
-        case tables_list::_quit:
-            return false;
-            break;
     }
-    return true;
 }
 
 bool min_ui::login() {
@@ -351,3 +358,5 @@ bool min_ui::adduser(io_base<employe_t>* employes) {
     reg.role = roles_enum::chief;
     return secure->useradd(&reg);
 }
+
+#endif /* AZ_USE_MIN_UI */
