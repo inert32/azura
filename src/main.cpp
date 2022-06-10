@@ -62,7 +62,6 @@ int main(int argc, char** argv) {
     }
     catch (const std::exception &e) {
        ui_global->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
-       return -1;
     }
 
     delete ui_global;
