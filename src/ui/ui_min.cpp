@@ -119,27 +119,13 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
                   << entry->town_from << '\t'
                   << entry->town_to << '\t'
                   << entry->date_start << '\t'
-                  << entry->date_end << '\t';
-        auto manager = employes_ptr->record_read(entry->manager);
-        if (manager != nullptr)
-            std::cout << "(" << entry->manager << ") " 
-            << manager->surname << ' '
-            << manager->name    << ' ' 
-            << manager->patronymic << '\t';
-        else
-            std::cout << "(" << entry->manager << ") Unknown" << '\t';
-
+                  << entry->date_end << '\t'
+                  << human_to_string(employes_ptr, entry->manager);
+        
         const auto count = entry->tourists.size();
         for (size_t i = 0; i < count; i++) {
-            auto t = tourists_ptr->record_read(i);
-            if (t != nullptr)
-                std::cout << "(" << i << ") " 
-                << t->surname << ' ' 
-                << t->name    << ' ' 
-                << t-> patronymic 
-                << "\n\t\t\t\t\t\t\t\t\t\t";
-            else
-                std::cout << "(" << i << ") Unknown";
+            std::cout << human_to_string(tourists_ptr, entry->tourists[i]);
+            std::cout << "\n\t\t\t\t\t\t\t\t\t\t";
         }
         std::cout << std::endl;
     }

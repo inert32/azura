@@ -75,6 +75,10 @@ bool date::validate() {
     return true;
 }
 
+std::string date::to_string() {
+    return std::to_string(day) + '.' + std::to_string(month) + '.' + std::to_string(year);
+}
+
 std::string role_pretty(const roles_enum role) {
     switch (role) {
         case roles_enum::guide:   return "Guide";

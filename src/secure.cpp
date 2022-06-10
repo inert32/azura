@@ -3,13 +3,11 @@
 
 #include "secure.h"
 
-secure_ctl* secure = nullptr;
-
 secure_ctl::secure_ctl(io_base<employe_t>* io) {
     _io = io;
-    logged_in = false;
-    uid = -1;
-    rid = roles_enum::guide;
+    logged_in = true;
+    uid = 0;
+    rid = roles_enum::chief;
 }
 
 db_id_t secure_ctl::get_uid() {

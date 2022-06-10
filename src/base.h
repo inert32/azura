@@ -22,6 +22,7 @@ public:
     date(unsigned short day, unsigned short month, int year);
     void set(std::string str);
     void set(unsigned short day, unsigned short month, int year);
+    std::string to_string();
 
     bool validate();
 

@@ -27,6 +27,13 @@ const std::string AZ_LOC_TAB_PATRONYMIC = "Patronymic";
 const std::string AZ_LOC_TAB_PASSPORT_NUMBER = "Passport number";
 const std::string AZ_LOC_TAB_PASSPORT_SERIES = "Passport series";
 const std::string AZ_LOC_TAB_PHONE_NUMBER = "Phone number";
+const std::string AZ_LOC_TAB_TOWN_FROM = "Town from";
+const std::string AZ_LOC_TAB_TOWN_TO = "Town to";
+const std::string AZ_LOC_TAB_DATE_START = "Date start";
+const std::string AZ_LOC_TAB_DATE_END = "Date end";
+const std::string AZ_LOC_TAB_MANAGER = "Manager";
+const std::string AZ_LOC_TAB_TOURISTS = "Tourists list";
+const std::string AZ_LOC_TAB_ROLE = "Role";
 
 const std::string AZ_LOC_ERR_EXCEPTION = "Exception occured";
 const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";

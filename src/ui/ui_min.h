@@ -3,6 +3,8 @@
 
 #include "ui.h"
 
+#ifdef AZ_USE_MIN_UI
+
 #include <iostream>
 #ifdef _WIN32
 #include <Windows.h>
@@ -152,5 +154,7 @@ void min_ui_main<T>::record_delete(db_base<T>* table) {
     }
     else std::cout << "No such record." << std::endl;
 }
+
+#endif /* AZ_USE_MIN_UI */
 
 #endif /* __UI_MIN_H__ */
