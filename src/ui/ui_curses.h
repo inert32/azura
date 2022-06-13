@@ -58,7 +58,7 @@ private:
     db_base<employe_t>* employes_ptr = nullptr;
 
     void _mk_tables();
-    void _fill_tables(db_base<T>* origin);
+    size_t _fill_tables(db_base<T>* origin);
     void _mk_tables_headers();
     unsigned int* _calc_table_width();
     WINDOW* ui_table[7] = { nullptr };
@@ -121,7 +121,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
     wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit");
     wnoutrefresh(actions);
     while (true) {
-        _fill_tables(table);
+        auto low_border = _fill_tables(table);
         for (int i = 0; i < 7; i++) wnoutrefresh(ui_table[i]);
         doupdate();
         delwin(actions);
@@ -142,7 +142,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
         }
         case KEY_DOWN: {
             if (current_id < table->db_size() - 1) current_id++;
-            if (current_id > top_id + tty_heigth - 3) top_id++; // decrease top_id if we get below screen
+            if (current_id > top_id + tty_heigth - 3 || low_border > top_id + tty_heigth - 3) top_id++; // decrease top_id if we get below screen
             break;
         }
         case KEY_F(10):

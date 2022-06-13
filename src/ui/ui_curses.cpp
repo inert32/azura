@@ -156,7 +156,7 @@ unsigned int *curses_ui_main<tourist_t>::_calc_table_width() {
 }
 
 template<>
-void curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
+size_t curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
     size_t y_offset = 0;
     for (int i = 0; i < 7; i++) wclear(ui_table[i]);
     for (db_id_t i = top_id; i < tty_heigth + top_id - 2; i++) {
@@ -177,6 +177,7 @@ void curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
         if (c != 0) for (int i = 0; i < 7; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
+    return 0;
 }
 
 template<>
@@ -210,9 +211,11 @@ unsigned int *curses_ui_main<tour_t>::_calc_table_width() {
 }
 
 template<>
-void curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
+size_t curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
     size_t y_offset = 0;
-    for (db_id_t i = current_id; i < tty_heigth - 2; i++) {
+    size_t low_border = 0;
+    for (int i = 0; i < 7; i++) werase(ui_table[i]);
+    for (db_id_t i = top_id; i < tty_heigth - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
         int c = 0;
@@ -227,13 +230,15 @@ void curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
         mvwprintw(ui_table[4], y_offset, 0, entry->date_end.to_string());
         mvwprintw(ui_table[5], y_offset, 0, std::to_string(entry->manager));
         const auto count = entry->tourists.size();
+        low_border += count;
         for (size_t i = 0; i < count; i++) {
             mvwprintw(ui_table[6], y_offset, 0, human_to_string(tourists_ptr, entry->tourists[i]));
-            y_offset++;
+            if (i + 1 < count) y_offset++;
         }
         if (c != 0) for (int i = 0; i < 7; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
+    return low_border;
 }
 
 template<>
@@ -262,9 +267,9 @@ unsigned int *curses_ui_main<employe_t>::_calc_table_width() {
 }
 
 template<>
-void curses_ui_main<employe_t>::_fill_tables(db_base<employe_t>* origin) {
+size_t curses_ui_main<employe_t>::_fill_tables(db_base<employe_t>* origin) {
     size_t y_offset = 0;
-    for (db_id_t i = current_id; i < tty_heigth - 2; i++) {
+    for (db_id_t i = top_id; i < tty_heigth - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
         int c = 0;
@@ -281,6 +286,7 @@ void curses_ui_main<employe_t>::_fill_tables(db_base<employe_t>* origin) {
         if (c != 0) for (int i = 0; i < 6; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
+    return 0;
 }
 
 template<>
