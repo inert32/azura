@@ -1,7 +1,5 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-
-#include <iostream>
 #include "ui.h"
 
 #ifdef AZ_USE_CURSES_UI
@@ -20,11 +18,23 @@ int wprintw(WINDOW *win, const std::string& fmt) {
 }
 
 curses_ui::curses_ui() {
-    initscr();
-    noecho();
-    keypad(stdscr, true);
-    raw();
-    current = tables_list::tourists;
+    initscr(); // Enable ncurses
+    noecho();  // Disable control symbol output to screen
+    keypad(stdscr, true); // Enable F* keys
+    raw(); // Send all keys directly to program
+    // Setup colors
+    if (has_colors()) {
+        start_color();
+        init_pair(tty_colors_entry_corrupted, COLOR_RED, COLOR_BLACK);
+        init_pair(tty_colors_entry_sel, COLOR_BLACK, COLOR_WHITE);
+        init_pair(tty_colors_title, COLOR_GREEN, COLOR_BLACK);
+    }
+    else {
+        init_pair(tty_colors_entry_corrupted, COLOR_BLACK, COLOR_WHITE);
+        init_pair(tty_colors_entry_sel, COLOR_BLACK, COLOR_WHITE);
+        init_pair(tty_colors_title, COLOR_WHITE, COLOR_BLACK);
+    }
+    current = tables_list::tours;
     tty_heigth = LINES;
     tty_width = COLS;
     tty_heigth_subwin = tty_heigth / 3;
@@ -39,6 +49,7 @@ curses_ui::~curses_ui() {
 void curses_ui::msg(const std::string& body, const std::string& head) {
     auto w = new curses_subwin(head);
     auto wnd = w->get_raw();
+    
     mvwprintw(wnd, 1, 1, body);
     wrefresh(wnd);
     getch();
@@ -46,10 +57,7 @@ void curses_ui::msg(const std::string& body, const std::string& head) {
 }
 
 void curses_ui::msg(const std::string& body) {
-    WINDOW* wnd = newwin(1, tty_width, tty_heigth - 1, 0);
-    wprintw(wnd, body);
-    wrefresh(wnd);
-    delwin(wnd);
+    msg(body, "Message");
 }
 
 void curses_ui::main(db_base<tourist_t>* tourists, 
@@ -96,7 +104,9 @@ bool curses_ui::adduser(io_base<employe_t>* employes) {
 curses_subwin::curses_subwin(const std::string& title) {
     wnd = newwin(heigth, width, start_y, start_x);
     box(wnd, 0, 0);
+    wattron(wnd, COLOR_PAIR(tty_colors_title));
     mvwprintw(wnd, 0, 2, title);
+    wattroff(wnd, COLOR_PAIR(tty_colors_title));
     wrefresh(wnd);
 }
 curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx) {
@@ -106,9 +116,11 @@ curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols
     start_y = starty;
 
     wnd = newwin(heigth, width, start_y, start_x);
+    wattron(wnd, COLOR_PAIR(tty_colors_title));
     box(wnd, 0, 0);
     mvwprintw(wnd, 0, 2, title);
     wrefresh(wnd);
+    wattroff(wnd, COLOR_PAIR(tty_colors_title));
 }
 
 curses_subwin::~curses_subwin() {
@@ -145,10 +157,16 @@ unsigned int *curses_ui_main<tourist_t>::_calc_table_width() {
 
 template<>
 void curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
-    size_t y_offset = 1;
-    for (db_id_t i = current_id; i < tty_heigth - 3; i++) {
+    size_t y_offset = 0;
+    for (int i = 0; i < 7; i++) wclear(ui_table[i]);
+    for (db_id_t i = top_id; i < tty_heigth + top_id - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
+        int c = 0;
+        if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
+        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+
+        if (c != 0) for (int i = 0; i < 7; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
         mvwprintw(ui_table[1], y_offset, 0, entry->surname);
         mvwprintw(ui_table[2], y_offset, 0, entry->name);
@@ -156,35 +174,28 @@ void curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
         mvwprintw(ui_table[4], y_offset, 0, std::to_string(entry->passport_series));
         mvwprintw(ui_table[5], y_offset, 0, std::to_string(entry->passport_number));
         mvwprintw(ui_table[6], y_offset, 0, phone_to_str(entry->phone_number));
+        if (c != 0) for (int i = 0; i < 7; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
 }
 
 template<>
 void curses_ui_main<tourist_t>::_mk_tables_headers() {
-    for (int i = 0; i < 7; i++)
-        wprintw(ui_table[i], AZ_LOC_TABLIST_TOURIST_T[i]);
+    for (int i = 0; i < 7; i++) {
+        wattron(ui_head[i], COLOR_PAIR(tty_colors_title));
+        wprintw(ui_head[i], AZ_LOC_TABLIST_TOURIST_T[i]);
+        wattroff(ui_head[i], COLOR_PAIR(tty_colors_title));
+    }
 }
 
 template<>
 tourist_t curses_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     tourist_t rec;
-    ui_global->msg("DEBUG!", "DEBUG!");
     std::string title = (old_data == nullptr) ? "Create record" : "Edit record";
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
     size_t y = 0, x = 0;
     window->get_size(&y, &x);
-    int y_offset = 1; 
-    if (y >= 9) { 
-        y_offset++; y++; 
-    }
-    else y = 1;
-    for (int i = 1; i < 7; i++) {
-        window->print(AZ_LOC_TABLIST_TOURIST_T[i], y);
-        y += y_offset;
-    }
-    getch();
     delete window;
     return rec;
 }
@@ -200,10 +211,15 @@ unsigned int *curses_ui_main<tour_t>::_calc_table_width() {
 
 template<>
 void curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
-    size_t y_offset = 1;
-    for (db_id_t i = current_id; i < tty_heigth - 3; i++) {
+    size_t y_offset = 0;
+    for (db_id_t i = current_id; i < tty_heigth - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
+        int c = 0;
+        if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
+        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+
+        if (c != 0) for (int i = 0; i < 7; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
         mvwprintw(ui_table[1], y_offset, 0, entry->town_from);
         mvwprintw(ui_table[2], y_offset, 0, entry->town_to);
@@ -215,14 +231,18 @@ void curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
             mvwprintw(ui_table[6], y_offset, 0, human_to_string(tourists_ptr, entry->tourists[i]));
             y_offset++;
         }
+        if (c != 0) for (int i = 0; i < 7; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
 }
 
 template<>
 void curses_ui_main<tour_t>::_mk_tables_headers() {
-    for (int i = 0; i < 7; i++)
-        wprintw(ui_table[i], AZ_LOC_TABLIST_TOUR_T[i]);
+    for (int i = 0; i < 7; i++) {
+        wattron(ui_head[i], COLOR_PAIR(tty_colors_title));
+        wprintw(ui_head[i], AZ_LOC_TABLIST_TOUR_T[i]);
+        wattroff(ui_head[i], COLOR_PAIR(tty_colors_title));
+    }
 }
 
 template<>
@@ -243,24 +263,33 @@ unsigned int *curses_ui_main<employe_t>::_calc_table_width() {
 
 template<>
 void curses_ui_main<employe_t>::_fill_tables(db_base<employe_t>* origin) {
-    size_t y_offset = 1;
-    for (db_id_t i = current_id; i < tty_heigth - 3; i++) {
+    size_t y_offset = 0;
+    for (db_id_t i = current_id; i < tty_heigth - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
+        int c = 0;
+        if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
+        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+
+        if (c != 0) for (int i = 0; i < 6; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
         mvwprintw(ui_table[1], y_offset, 0, entry->surname);
         mvwprintw(ui_table[2], y_offset, 0, entry->name);
         mvwprintw(ui_table[3], y_offset, 0, entry->patronymic);
         mvwprintw(ui_table[4], y_offset, 0, std::to_string(entry->phone_number));
         mvwprintw(ui_table[5], y_offset, 0, role_pretty(entry->role));
+        if (c != 0) for (int i = 0; i < 6; i++) wattroff(ui_table[i], COLOR_PAIR(c));
         y_offset++;
     }
 }
 
 template<>
 void curses_ui_main<employe_t>::_mk_tables_headers() {
-    for (int i = 0; i < 6; i++)
-        wprintw(ui_table[i], AZ_LOC_TABLIST_EMPLOYE_T[i]);
+    for (int i = 0; i < 6; i++) {
+        wattron(ui_head[i], COLOR_PAIR(tty_colors_title));
+        wprintw(ui_head[i], AZ_LOC_TABLIST_EMPLOYE_T[i]);
+        wattroff(ui_head[i], COLOR_PAIR(tty_colors_title));
+    }
 }
 
 template<>
