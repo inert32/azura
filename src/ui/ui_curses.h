@@ -183,7 +183,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
             record_update(table);
             break;
         case KEY_F(3):
-            ui_global->msg("Delete record", "remove");
+            record_delete(table);
             break;
         case KEY_F(9):
             return switch_table(current);
@@ -226,7 +226,46 @@ void curses_ui_main<T>::record_update(db_base<T>* table) {
 }
 
 template<class T>
-void curses_ui_main<T>::record_delete(db_base<T>* table) {}
+void curses_ui_main<T>::record_delete(db_base<T>* table) {
+    ITEM* items[3] = { new_item("Ye", ""), new_item("No", ""), nullptr };
+    MENU* menu = new_menu(items);
+    auto wnd = new curses_subwin("Remove record", 14, 16);
+    auto raw = wnd->get_raw();
+    set_menu_win(menu, raw);
+    size_t x,y; wnd->get_size(&x, &y);
+    set_menu_sub(menu, derwin(raw, 2, 5, 1, ((x - 10) / 2)));
+    set_menu_mark(menu, ">");
+    post_menu(menu);
+    int ch;
+    bool run = true, ret = false, force_no = false;
+    while (run) {
+        wrefresh(raw);
+        switch (ch = getch()) {
+        case KEY_UP:
+            menu_driver(menu, REQ_UP_ITEM);
+            break;
+        case KEY_DOWN:
+            menu_driver(menu, REQ_DOWN_ITEM);
+            break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            break;
+        case 27: // Escape key
+            run = false;
+            force_no = true; // Additional protection
+            break;
+        default: break;
+        }
+    }
+    if (current_item(menu) == items[0] && force_no == false) ret = true;
+    unpost_menu(menu);
+    free_menu(menu);
+    for (int i = 0; i < 3; i++) free_item(items[i]);
+    delete wnd;
+    if (ret) table->record_delete(current_id);
+}
 
 #endif /* AZ_USE_CURSES_UI */
 
