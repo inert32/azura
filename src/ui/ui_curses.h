@@ -43,7 +43,7 @@ class curses_ui_main {
 public:
     void set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes);
     tables_list main(db_base<T>* table, const tables_list current);
-    T create_record(T* old_data = nullptr);
+    bool create_record(T* new_data, T* old_data = nullptr);
 
 private:
     void record_create(db_base<T>* table);
@@ -204,8 +204,12 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
 
 template<class T>
 void curses_ui_main<T>::record_create(db_base<T>* table) {
-    auto rec = create_record(nullptr);
-    //table->record_create(&rec);
+    T rec;
+    if (create_record(&rec)) {
+        prettify_records<T> p;
+        p.prettyify(&rec);
+        table->record_create(&rec);
+    }
 }
 
 template<class T>

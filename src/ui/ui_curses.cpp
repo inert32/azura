@@ -204,32 +204,85 @@ void curses_ui_main<tourist_t>::_mk_tables_headers() {
 }
 
 template<>
-tourist_t curses_ui_main<tourist_t>::create_record(tourist_t* old_data) {
-    tourist_t rec;
+bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* old_data) {
     std::string title = (old_data == nullptr) ? "CrEate record" : "Edit record";
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
-    wrefresh(raw);
-    size_t y = 0, x = 0;
-    window->get_size(&y, &x);
-    FIELD* fields[8];
-    for (int i = 0; i < 7; i++) {
+    FIELD* fields[7];
+    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOURIST_T[0]);
+    if (old_data != nullptr)
+        mvwprintw(raw, 2, 20, std::to_string(old_data->metadata.id));
+    for (int i = 1; i < 7; i++) {
         mvwprintw(raw, 2 + i * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i]);
-        fields[i] = new_field(1, 16, 2 + i * 2, 12, 0, 0);
+        fields[i - 1] = new_field(1, 20, i * 2, 12, 0, 0);
     }
-    fields[7] = nullptr;
+    fields[6] = nullptr;
     FORM* form = new_form(fields);
+    int y = 0, x = 0;
+    scale_form(form, &y, &x);
     set_form_win(form, raw);
+    set_form_sub(form, derwin(raw, y, x, 2, 20));
     post_form(form);
     wrefresh(raw);
-    getch();
-
+    bool run = true;
+    bool send_away = false;
+    int ch;
+    while (run) {
+        wrefresh(raw);
+        switch (ch = getch()) {
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD);
+            form_driver(form, REQ_END_LINE);
+            break;
+        case KEY_DOWN:
+            form_driver(form, REQ_NEXT_FIELD);
+            form_driver(form, REQ_END_LINE);
+            break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            send_away = true;
+            break;
+        case 27: // Escape key
+            run = false;
+            break;
+        default: 
+            form_driver(form, ch);
+            break;
+        }
+        form_driver(form, REQ_VALIDATION);
+    }
+    if (send_away) { // Save data
+        for (int i = 0; i < 6; i++) {
+            try {
+                std::string buf(field_buffer(fields[i], 0));
+                switch (i) {
+                case 0:
+                    new_data->surname = buf; break;
+                case 1:
+                    new_data->name = buf; break;
+                case 2: 
+                    new_data->patronymic = buf; break;
+                case 3:
+                    new_data->passport_number = std::stoul(buf); break;
+                case 4:
+                    new_data->passport_series = std::stoul(buf); break;
+                case 5:
+                    new_data->phone_number = std::stoull(buf); break;
+                }
+            }
+            catch (const std::exception& e) {
+                new_data->metadata.corrupt = true;
+            }
+        }
+    }
     unpost_form(form);
     free_form(form);
-    for (int i = 0; i < 8; i++) free_field(fields[i]);
+    for (int i = 0; i < 7; i++) free_field(fields[i]);
     wrefresh(raw);
     delete window;
-    return rec;
+    return send_away;
 }
 
 template<>
@@ -282,9 +335,9 @@ void curses_ui_main<tour_t>::_mk_tables_headers() {
 }
 
 template<>
-tour_t curses_ui_main<tour_t>::create_record(tour_t* old_data) {
+bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
     tour_t rec;
-    return rec;
+    return false;
 }
 
 template<>
@@ -330,9 +383,9 @@ void curses_ui_main<employe_t>::_mk_tables_headers() {
 }
 
 template<>
-employe_t curses_ui_main<employe_t>::create_record(employe_t* old_data) {
+bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* old_data) {
     employe_t rec;
-    return rec;
+    return false;
 }
 
 #endif /* AZ_USE_CURSES_UI */
