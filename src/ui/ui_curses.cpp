@@ -22,6 +22,7 @@ curses_ui::curses_ui() {
     noecho();  // Disable control symbol output to screen
     keypad(stdscr, true); // Enable F* keys
     raw(); // Send all keys directly to program
+    nonl();
     // Setup colors
     if (has_colors()) {
         start_color();
@@ -34,11 +35,11 @@ curses_ui::curses_ui() {
         init_pair(tty_colors_entry_sel, COLOR_BLACK, COLOR_WHITE);
         init_pair(tty_colors_title, COLOR_WHITE, COLOR_BLACK);
     }
-    current = tables_list::tours;
+    current = tables_list::tourists;
     tty_heigth = LINES;
     tty_width = COLS;
-    tty_heigth_subwin = tty_heigth / 3;
-    tty_width_subwin = tty_width / 3;
+    tty_heigth_subwin = tty_heigth / 2;
+    tty_width_subwin = 3 * tty_width / 5;
     refresh();
 }
 
@@ -192,11 +193,28 @@ void curses_ui_main<tourist_t>::_mk_tables_headers() {
 template<>
 tourist_t curses_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     tourist_t rec;
-    std::string title = (old_data == nullptr) ? "Create record" : "Edit record";
+    std::string title = (old_data == nullptr) ? "CrEate record" : "Edit record";
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
+    wrefresh(raw);
     size_t y = 0, x = 0;
     window->get_size(&y, &x);
+    FIELD* fields[8];
+    for (int i = 0; i < 7; i++) {
+        mvwprintw(raw, 2 + i * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i]);
+        fields[i] = new_field(1, 16, 2 + i * 2, 12, 0, 0);
+    }
+    fields[7] = nullptr;
+    FORM* form = new_form(fields);
+    set_form_win(form, raw);
+    post_form(form);
+    wrefresh(raw);
+    getch();
+
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 8; i++) free_field(fields[i]);
+    wrefresh(raw);
     delete window;
     return rec;
 }

@@ -82,7 +82,7 @@ private:
     size_t heigth = tty_heigth_subwin;
     size_t width = tty_width_subwin;
     size_t start_y = tty_heigth / 4;
-    size_t start_x = tty_width / 3;
+    size_t start_x = tty_width / 5;
     WINDOW* wnd;
 };
 
@@ -110,24 +110,67 @@ void curses_ui_main<T>::_mk_tables() {
 
 template<class T>
 tables_list curses_ui_main<T>::switch_table() {
-    return tables_list::_quit;
+    ITEM* items[4];
+    items[0] = new_item("Tourists", "");
+    items[1] = new_item("Tours", "");
+    items[2] = new_item("Employes", "");
+    items[3] = nullptr;
+    MENU* menu = new_menu(items);
+    auto wnd = new curses_subwin("Select table");
+    auto raw = wnd->get_raw();
+    keypad(raw, true);
+    set_menu_win(menu, raw);
+    set_menu_sub(menu, derwin(raw, 5, 10, 1, 1));
+    set_menu_mark(menu, ">");
+    post_menu(menu);
+    int ch;
+    bool run = true;
+    while (run) {
+        wrefresh(raw);
+        switch (ch = getch()) {
+        case KEY_UP:
+            menu_driver(menu, REQ_UP_ITEM);
+            break;
+        case KEY_DOWN:
+            menu_driver(menu, REQ_DOWN_ITEM);
+            break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            break;
+        default: break;
+        }
+    }
+    tables_list ret = tables_list::_quit;
+    auto choose = current_item(menu);
+    if (choose == items[0]) ret = tables_list::tourists;
+    if (choose == items[1]) ret = tables_list::tours;
+    if (choose == items[2]) ret = tables_list::employes;
+    unpost_menu(menu);
+    free_menu(menu);
+    for (int i = 0; i < 4; i++) free_item(items[i]);
+    delete wnd;
+    return ret;
 }
 
 template<class T>
 tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current) {
     _mk_tables();
-    for (int i = 0; i < 7; i++) wnoutrefresh(ui_head[i]);
-    WINDOW* actions = newwin(1, tty_width, tty_heigth - 1, 0);
-    wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit");
-    wnoutrefresh(actions);
     while (true) {
-        auto low_border = _fill_tables(table);
-        for (int i = 0; i < 7; i++) wnoutrefresh(ui_table[i]);
+        WINDOW* actions = newwin(1, tty_width, tty_heigth - 1, 0);
+        wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit");
+        wnoutrefresh(actions);
+        auto low_border = _fill_tables(table); // Used only in tour_t because of entries size
+        for (int i = 0; i < 7; i++) {
+            wnoutrefresh(ui_head[i]);
+            wnoutrefresh(ui_table[i]);
+        }
         doupdate();
         delwin(actions);
         switch (auto c = getch())
         case KEY_F(1): {
-            ui_global->msg("Create record", "Edit");
+            record_create(table);
             break;
         case KEY_F(2):
             ui_global->msg("Edit record", "Edit");
@@ -135,6 +178,8 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
         case KEY_F(3):
             ui_global->msg("Delete record", "remove");
             break;
+        case KEY_F(9):
+            return switch_table();
         case KEY_UP: {
             if (current_id > 0) current_id--;
             if (current_id < top_id) top_id--;

@@ -8,6 +8,7 @@
 #ifdef AZ_CURSES
     #define AZ_USE_CURSES_UI
     #include <curses.h>
+    #include <menu.h>
     #include <form.h>
     #include "ui_curses.h"
     #define current_ui curses_ui
