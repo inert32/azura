@@ -176,6 +176,9 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
         case KEY_F(1): {
             record_create(table);
             break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
         case KEY_F(2):
             record_update(table);
             break;
@@ -218,7 +221,7 @@ void curses_ui_main<T>::record_update(db_base<T>* table) {
     if (create_record(&rec, table->record_read(current_id))) {
         prettify_records<T> p;
         p.prettyify(&rec);
-        table->record_create(&rec);
+        table->record_update(&rec, current_id);
     }
 }
 

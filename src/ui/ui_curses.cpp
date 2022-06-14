@@ -18,6 +18,7 @@ int wprintw(WINDOW *win, const std::string& fmt) {
 }
 
 curses_ui::curses_ui() {
+    setlocale(LC_ALL, "");
     initscr(); // Enable ncurses
     noecho();  // Disable control symbol output to screen
     keypad(stdscr, true); // Enable F* keys
@@ -205,7 +206,7 @@ void curses_ui_main<tourist_t>::_mk_tables_headers() {
 
 template<>
 bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* old_data) {
-    std::string title = (old_data == nullptr) ? "Create record" : "Edit record";
+    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
     mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOURIST_T[0]);
