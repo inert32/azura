@@ -34,6 +34,7 @@ extern const std::string AZ_LOC_TAB_DATE_END;
 extern const std::string AZ_LOC_TAB_MANAGER;
 extern const std::string AZ_LOC_TAB_TOURISTS;
 extern const std::string AZ_LOC_TAB_ROLE;
+extern const std::string AZ_LOC_TAB_PASSWD;
 
 extern const std::string AZ_LOC_TABLIST_TOURIST_T[];
 extern const std::string AZ_LOC_TABLIST_TOUR_T[];

@@ -24,13 +24,6 @@
 
 #include "locale.h"
 
-/* TODO List
-tourist_ctl                 : 9/9 
-
-DB recovery                 : no
-Backup before edit/remove   : no
-*/
-
 int main(int argc, char** argv) {
     parse_cli(argc, argv);
     ui_global = new current_ui();

@@ -34,6 +34,7 @@ const std::string AZ_LOC_TAB_DATE_END = "Date end";
 const std::string AZ_LOC_TAB_MANAGER = "Manager";
 const std::string AZ_LOC_TAB_TOURISTS = "Tourists list";
 const std::string AZ_LOC_TAB_ROLE = "Role";
+const std::string AZ_LOC_TAB_PASSWD = "Password";
 
 const std::string AZ_LOC_TABLIST_TOURIST_T[] = 
 { AZ_LOC_TAB_ID, AZ_LOC_TAB_SURNAME, AZ_LOC_TAB_NAME, 
@@ -45,7 +46,8 @@ const std::string AZ_LOC_TABLIST_TOUR_T[] =
   AZ_LOC_TAB_MANAGER, AZ_LOC_TAB_TOURISTS };
 const std::string AZ_LOC_TABLIST_EMPLOYE_T[] = 
 { AZ_LOC_TAB_ID, AZ_LOC_TAB_SURNAME, AZ_LOC_TAB_NAME, 
-  AZ_LOC_TAB_PATRONYMIC, AZ_LOC_TAB_PHONE_NUMBER, AZ_LOC_TAB_ROLE };
+  AZ_LOC_TAB_PATRONYMIC, AZ_LOC_TAB_PHONE_NUMBER, 
+  AZ_LOC_TAB_PASSWD, AZ_LOC_TAB_ROLE };
 
 const std::string AZ_LOC_ERR_EXCEPTION = "Exception occured";
 const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";

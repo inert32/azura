@@ -227,7 +227,7 @@ void curses_ui_main<T>::record_update(db_base<T>* table) {
 
 template<class T>
 void curses_ui_main<T>::record_delete(db_base<T>* table) {
-    ITEM* items[3] = { new_item("Ye", ""), new_item("No", ""), nullptr };
+    ITEM* items[3] = { new_item("Yes", ""), new_item("No", ""), nullptr };
     MENU* menu = new_menu(items);
     auto wnd = new curses_subwin("Remove record", 14, 16);
     auto raw = wnd->get_raw();
@@ -237,7 +237,7 @@ void curses_ui_main<T>::record_delete(db_base<T>* table) {
     set_menu_mark(menu, ">");
     post_menu(menu);
     int ch;
-    bool run = true, ret = false, force_no = false;
+    bool run = true, ret = false, escape = false;
     while (run) {
         wrefresh(raw);
         switch (ch = getch()) {
@@ -254,12 +254,12 @@ void curses_ui_main<T>::record_delete(db_base<T>* table) {
             break;
         case 27: // Escape key
             run = false;
-            force_no = true; // Additional protection
+            escape = true; // Additional protection, since escape can be pressed at 'Yes' option
             break;
         default: break;
         }
     }
-    if (current_item(menu) == items[0] && force_no == false) ret = true;
+    if (current_item(menu) == items[0] && escape == false) ret = true;
     unpost_menu(menu);
     free_menu(menu);
     for (int i = 0; i < 3; i++) free_item(items[i]);

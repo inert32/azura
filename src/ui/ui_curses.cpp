@@ -410,8 +410,138 @@ void curses_ui_main<employe_t>::_mk_tables_headers() {
 
 template<>
 bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* old_data) {
-    employe_t rec;
-    return false;
+    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
+    auto window = new curses_subwin(title);
+    auto raw = window->get_raw();
+    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[0]);
+    FIELD* fields[6];
+    roles_enum role = roles_enum::guide;
+    for (int i = 0; i < 5; i++) {
+        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[i + 1]);
+        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        if (old_data != nullptr) {
+            switch (i) {
+            case 0:
+                set_field_buffer(fields[i], 0, old_data->surname.c_str());
+                break;
+            case 1:
+                set_field_buffer(fields[i], 0, old_data->name.c_str());
+                break;
+            case 2:
+                set_field_buffer(fields[i], 0, old_data->patronymic.c_str());
+                break;
+            case 3:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str());
+                break;
+            case 4:
+                set_field_buffer(fields[i], 0, old_data->passwd.c_str());
+                break;
+            }
+            role = old_data->role;
+        }
+    }
+
+    fields[5] = nullptr;
+    FORM* form = new_form(fields);
+    int y = 0, x = 0;
+    scale_form(form, &y, &x);
+    set_form_win(form, raw);
+    set_form_sub(form, derwin(raw, y, x, 2, 20));
+    post_form(form);
+
+    if (old_data != nullptr)
+        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
+    mvwprintw(raw, 14, 2, AZ_LOC_TABLIST_EMPLOYE_T[6]);
+
+    bool run = true;
+    bool send_away = false;
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
+    mvwprintw(raw, 17, 1, "Press left or right arrow to adjust role");
+    while (run) {
+        mvwprintw(raw, 14, 32, role_pretty(role) + "  ");
+        form_driver(form, REQ_END_LINE);
+        wrefresh(raw);
+        switch (int ch = getch()) {
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD);
+            form_driver(form, REQ_END_LINE);
+            break;
+        case KEY_DOWN:
+            form_driver(form, REQ_NEXT_FIELD);
+            form_driver(form, REQ_END_LINE);
+            break;
+        case KEY_LEFT: {
+            switch (role) {
+            case roles_enum::manager:
+                role = roles_enum::guide;
+                break;
+            case roles_enum::chief:
+                role = roles_enum::manager;
+                break;
+            default: break;
+            }
+            break;
+        }
+        case KEY_RIGHT: {
+            switch (role) {
+            case roles_enum::guide:
+                role = roles_enum::manager;
+                break;
+            case roles_enum::manager:
+                role = roles_enum::chief;
+                break;
+            default: break;
+            }
+            break;
+        }
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            send_away = true;
+            break;
+        case 27: // Escape key
+            run = false;
+            break;
+        case KEY_BACKSPACE:
+            form_driver(form, REQ_CLR_FIELD);
+            break;
+        default: 
+            form_driver(form, ch);
+            break;
+        }
+        form_driver(form, REQ_VALIDATION);
+    }
+
+    if (send_away) { // Save data
+        for (int i = 0; i < 5; i++) {
+            try {
+                std::string buf(field_buffer(fields[i], 0));
+                switch (i) {
+                case 0:
+                    new_data->surname = buf; break;
+                case 1:
+                    new_data->name = buf; break;
+                case 2: 
+                    new_data->patronymic = buf; break;
+                case 3:
+                    new_data->phone_number = std::stoull(buf); break;
+                case 4:
+                    new_data->passwd = buf; break;
+                }
+            }
+            catch (const std::exception& e) {
+                new_data->metadata.corrupt = true;
+            }
+        }
+        new_data->role = role;
+    }
+    // cleanup
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 5; i++) free_field(fields[i]);
+    delete window;
+    return send_away;
 }
 
 #endif /* AZ_USE_CURSES_UI */

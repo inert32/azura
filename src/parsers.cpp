@@ -1,6 +1,11 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "parsers.h"
+#include "config.h"
+
+#define purify_buf(buf) \
+    (buf) = (buf).substr((buf).find_first_not_of(' ')); \
+    (buf) = (buf).substr(0, (buf).find_first_of(' '));
 
 template<>
 bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
@@ -10,7 +15,7 @@ bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            buf = buf.substr(buf.find_first_not_of(' '));
+            purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
@@ -55,7 +60,7 @@ bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            buf = buf.substr(buf.find_first_not_of(' '));
+            purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
@@ -106,7 +111,7 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            buf = buf.substr(buf.find_first_not_of(' '));
+            purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
