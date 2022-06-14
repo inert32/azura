@@ -177,7 +177,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
             record_create(table);
             break;
         case KEY_F(2):
-            ui_global->msg("Edit record", "Edit");
+            record_update(table);
             break;
         case KEY_F(3):
             ui_global->msg("Delete record", "remove");
@@ -213,7 +213,14 @@ void curses_ui_main<T>::record_create(db_base<T>* table) {
 }
 
 template<class T>
-void curses_ui_main<T>::record_update(db_base<T>* table) {}
+void curses_ui_main<T>::record_update(db_base<T>* table) {
+    T rec;
+    if (create_record(&rec, table->record_read(current_id))) {
+        prettify_records<T> p;
+        p.prettyify(&rec);
+        table->record_create(&rec);
+    }
+}
 
 template<class T>
 void curses_ui_main<T>::record_delete(db_base<T>* table) {}

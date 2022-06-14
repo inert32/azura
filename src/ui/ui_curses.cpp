@@ -205,16 +205,36 @@ void curses_ui_main<tourist_t>::_mk_tables_headers() {
 
 template<>
 bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* old_data) {
-    std::string title = (old_data == nullptr) ? "CrEate record" : "Edit record";
+    std::string title = (old_data == nullptr) ? "Create record" : "Edit record";
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
-    FIELD* fields[7];
     mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOURIST_T[0]);
-    if (old_data != nullptr)
-        mvwprintw(raw, 2, 20, std::to_string(old_data->metadata.id));
-    for (int i = 1; i < 7; i++) {
-        mvwprintw(raw, 2 + i * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i]);
-        fields[i - 1] = new_field(1, 20, i * 2, 12, 0, 0);
+    FIELD* fields[7];
+    for (int i = 0; i < 6; i++) {
+        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i + 1]);
+        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        if (old_data != nullptr) {
+            switch (i) {
+            case 0:
+                set_field_buffer(fields[i], 0, old_data->surname.c_str());
+                break;
+            case 1:
+                set_field_buffer(fields[i], 0, old_data->name.c_str());
+                break;
+            case 2:
+                set_field_buffer(fields[i], 0, old_data->patronymic.c_str());
+                break;
+            case 3:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_series).c_str());
+                break;
+            case 4:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_number).c_str());
+                break;
+            case 5:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str());
+                break;
+            }
+        }
     }
     fields[6] = nullptr;
     FORM* form = new_form(fields);
@@ -223,13 +243,15 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
     set_form_win(form, raw);
     set_form_sub(form, derwin(raw, y, x, 2, 20));
     post_form(form);
+    if (old_data != nullptr)
+        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
     wrefresh(raw);
     bool run = true;
     bool send_away = false;
-    int ch;
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
     while (run) {
         wrefresh(raw);
-        switch (ch = getch()) {
+        switch (int ch = getch()) {
         case KEY_UP:
             form_driver(form, REQ_PREV_FIELD);
             form_driver(form, REQ_END_LINE);
@@ -246,6 +268,9 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
             break;
         case 27: // Escape key
             run = false;
+            break;
+        case KEY_BACKSPACE:
+            form_driver(form, REQ_CLR_FIELD);
             break;
         default: 
             form_driver(form, ch);
@@ -277,10 +302,10 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
             }
         }
     }
+    // cleanup
     unpost_form(form);
     free_form(form);
     for (int i = 0; i < 7; i++) free_field(fields[i]);
-    wrefresh(raw);
     delete window;
     return send_away;
 }
