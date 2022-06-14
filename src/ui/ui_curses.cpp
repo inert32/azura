@@ -123,6 +123,19 @@ curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols
     wrefresh(wnd);
     wattroff(wnd, COLOR_PAIR(tty_colors_title));
 }
+curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols) {
+    heigth = lines;
+    width = cols;
+    start_x = (tty_width - cols) / 2;
+    start_y = (tty_heigth - lines) / 2;
+
+    wnd = newwin(heigth, width, start_y, start_x);
+    wattron(wnd, COLOR_PAIR(tty_colors_title));
+    box(wnd, 0, 0);
+    mvwprintw(wnd, 0, 2, title);
+    wrefresh(wnd);
+    wattroff(wnd, COLOR_PAIR(tty_colors_title));
+}
 
 curses_subwin::~curses_subwin() {
     wclear(wnd);

@@ -70,6 +70,7 @@ private:
 class curses_subwin {
 public:
     curses_subwin(const std::string& title);
+    curses_subwin(const std::string& title, size_t lines, size_t cols);
     curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx);
     ~curses_subwin();
 
@@ -112,12 +113,12 @@ template<class T>
 tables_list curses_ui_main<T>::switch_table(const tables_list current) {
     ITEM* items[4] = { new_item("Tourists", ""), new_item("Tours", ""), new_item("Employes", ""), nullptr };
     MENU* menu = new_menu(items);
-    auto wnd = new curses_subwin("Select table");
+    auto wnd = new curses_subwin("Select table", 14, 16);
     auto raw = wnd->get_raw();
     keypad(raw, true);
     set_menu_win(menu, raw);
     size_t x,y; wnd->get_size(&x, &y);
-    set_menu_sub(menu, derwin(raw, 5, 10, 1, ((x - 10) / 2)));
+    set_menu_sub(menu, derwin(raw, 3, 10, 1, ((x - 10) / 2)));
     set_menu_mark(menu, ">");
     post_menu(menu);
     int ch;
@@ -193,6 +194,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
             if (current_id > top_id + tty_heigth - 3 || low_border > top_id + tty_heigth - 3) top_id++; // decrease top_id if we get below screen
             break;
         }
+        case 27: // Escape key
         case KEY_F(10):
             return tables_list::_quit;
         }
