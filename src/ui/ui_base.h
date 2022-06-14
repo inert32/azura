@@ -5,10 +5,10 @@
 #include "../db_base.h"
 
 enum class tables_list {
+    _quit,
     tourists,
     tours,
-    employes,
-    _quit
+    employes
 };
 
 enum class ui_actions {

@@ -51,7 +51,7 @@ private:
     void record_delete(db_base<T>* table);
     void table_print(db_base<T>* table);
 
-    tables_list switch_table();
+    tables_list switch_table(const tables_list current);
 
     db_base<tourist_t>* tourists_ptr = nullptr;
     db_base<tour_t>* tours_ptr = nullptr;
@@ -109,22 +109,20 @@ void curses_ui_main<T>::_mk_tables() {
 }
 
 template<class T>
-tables_list curses_ui_main<T>::switch_table() {
-    ITEM* items[4];
-    items[0] = new_item("Tourists", "");
-    items[1] = new_item("Tours", "");
-    items[2] = new_item("Employes", "");
-    items[3] = nullptr;
+tables_list curses_ui_main<T>::switch_table(const tables_list current) {
+    ITEM* items[4] = { new_item("Tourists", ""), new_item("Tours", ""), new_item("Employes", ""), nullptr };
     MENU* menu = new_menu(items);
     auto wnd = new curses_subwin("Select table");
     auto raw = wnd->get_raw();
     keypad(raw, true);
     set_menu_win(menu, raw);
-    set_menu_sub(menu, derwin(raw, 5, 10, 1, 1));
+    size_t x,y; wnd->get_size(&x, &y);
+    set_menu_sub(menu, derwin(raw, 5, 10, 1, ((x - 10) / 2)));
     set_menu_mark(menu, ">");
     post_menu(menu);
     int ch;
     bool run = true;
+    tables_list ret = tables_list::_quit;
     while (run) {
         wrefresh(raw);
         switch (ch = getch()) {
@@ -139,14 +137,19 @@ tables_list curses_ui_main<T>::switch_table() {
         case KEY_ENTER:
             run = false;
             break;
+        case 27: // Escape key
+            ret = current;
+            run = false;
+            break;
         default: break;
         }
     }
-    tables_list ret = tables_list::_quit;
-    auto choose = current_item(menu);
-    if (choose == items[0]) ret = tables_list::tourists;
-    if (choose == items[1]) ret = tables_list::tours;
-    if (choose == items[2]) ret = tables_list::employes;
+    if (ret == tables_list::_quit) { // Switch table if user requested
+        auto choose = current_item(menu);
+        if (choose == items[0]) ret = tables_list::tourists;
+        if (choose == items[1]) ret = tables_list::tours;
+        if (choose == items[2]) ret = tables_list::employes;
+    }
     unpost_menu(menu);
     free_menu(menu);
     for (int i = 0; i < 4; i++) free_item(items[i]);
@@ -179,7 +182,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
             ui_global->msg("Delete record", "remove");
             break;
         case KEY_F(9):
-            return switch_table();
+            return switch_table(current);
         case KEY_UP: {
             if (current_id > 0) current_id--;
             if (current_id < top_id) top_id--;
