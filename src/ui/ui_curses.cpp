@@ -251,6 +251,7 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
     bool send_away = false;
     mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
     while (run) {
+        form_driver(form, REQ_END_LINE);
         wrefresh(raw);
         switch (int ch = getch()) {
         case KEY_UP:
@@ -362,8 +363,114 @@ void curses_ui_main<tour_t>::_mk_tables_headers() {
 
 template<>
 bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
-    tour_t rec;
-    return false;
+    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
+    auto window = new curses_subwin(title);
+    auto raw = window->get_raw();
+    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOUR_T[0]);
+    FIELD* fields[7];
+    for (int i = 0; i < 6; i++) {
+        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOUR_T[i + 1]);
+        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        if (old_data != nullptr) {
+            switch (i) {
+            case 0:
+                set_field_buffer(fields[i], 0, old_data->town_from.c_str());
+                break;
+            case 1:
+                set_field_buffer(fields[i], 0, old_data->town_to.c_str());
+                break;
+            case 2:
+                set_field_buffer(fields[i], 0, old_data->date_start.to_string().c_str());
+                break;
+            case 3:
+                set_field_buffer(fields[i], 0, old_data->date_end.to_string().c_str());
+                break;
+            case 4:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->manager).c_str());
+                break;
+            case 5: {
+                std::string str;
+                for (auto &x : old_data->tourists) str += std::to_string(x) + ";";
+                str.erase(str.end() - 1);
+                set_field_buffer(fields[i], 0, str.c_str());
+                break;
+            }
+            }
+        }
+    }
+    fields[6] = nullptr;
+    FORM* form = new_form(fields);
+    int y = 0, x = 0;
+    scale_form(form, &y, &x);
+    set_form_win(form, raw);
+    set_form_sub(form, derwin(raw, y, x, 2, 20));
+    post_form(form);
+    if (old_data != nullptr)
+        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
+    wrefresh(raw);
+    bool run = true, send_away = false;
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
+    while (run) {
+        form_driver(form, REQ_END_LINE);
+        wrefresh(raw);
+        switch (int ch = getch()) {
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD);
+            break;
+        case KEY_DOWN:
+            form_driver(form, REQ_NEXT_FIELD);
+            break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            send_away = true;
+            break;
+        case 27: // Escape key
+            run = false;
+            break;
+        case KEY_BACKSPACE:
+            form_driver(form, REQ_CLR_FIELD);
+            break;
+        default: 
+            form_driver(form, ch);
+            break;
+        }
+        form_driver(form, REQ_VALIDATION);
+    }
+    if (send_away) { // Save data
+        for (int i = 0; i < 6; i++) {
+            try {
+                std::string buf(field_buffer(fields[i], 0));
+                switch (i) {
+                case 0:
+                    new_data->town_from = buf; break;
+                case 1:
+                    new_data->town_to = buf; break;
+                case 2: 
+                    new_data->date_start.set(buf); break;
+                case 3:
+                    new_data->date_end.set(buf); break;
+                case 4:
+                    new_data->manager = std::stoull(buf); break;
+                case 5: {
+                    for (auto &c : buf) if (c == ',' || c == ' ') c = ';';
+                    parsers<tour_t> parser; 
+                    parser.parse_tourists_count(buf, &new_data->tourists);
+                }
+                }
+            }
+            catch (const std::exception& e) {
+                new_data->metadata.corrupt = true;
+            }
+        }
+    }
+    // cleanup
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 7; i++) free_field(fields[i]);
+    delete window;
+    return send_away;
 }
 
 template<>
