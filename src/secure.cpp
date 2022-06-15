@@ -3,8 +3,6 @@
 
 #include "secure.h"
 
-secure_ctl* secure = nullptr;
-
 secure_ctl::secure_ctl(io_base<employe_t>* io) {
     _io = io;
     logged_in = false;
@@ -36,7 +34,7 @@ void secure_ctl::_login(const employe_t* user) {
 	uid = user->metadata.id;
 	rid = user->role;
 	logged_in = true;
-	username = user->surname + ' ' + user->name + ' ' + user->patronymic;
+	username = purify_buf(user->surname) + ' ' + purify_buf(user->name) + ' ' + purify_buf(user->patronymic);
 }
 
 bool secure_ctl::need_admin() {
@@ -44,7 +42,7 @@ bool secure_ctl::need_admin() {
 }
 
 bool secure_ctl::need_login() {
-    return logged_in;
+    return !logged_in;
 }
 
 bool secure_ctl::useradd(const employe_t* user) {

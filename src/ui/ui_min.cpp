@@ -1,6 +1,8 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
-#include "ui_min.h"
+#include "ui.h"
+
+#ifdef AZ_USE_MIN_UI
 
 void _clean_input_buffer() {
 	std::cin.seekg(0, std::ios::end);
@@ -17,42 +19,54 @@ min_ui::min_ui() {
     #endif
 }
 
-void min_ui::msg(const std::string& msg) {
-    std::cout << msg << std::endl;
+void min_ui::msg(const std::string& body) {
+    std::cout << body << std::endl;
+}
+void min_ui::msg(const std::string& body, const std::string& head) {
+    std::cout << head << std::endl << body << std::endl;
 }
 
-bool min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
-    switch (current) {
-        case tables_list::tourists: {
-            auto ui = new min_ui_main<tourist_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(tourists, current);
-            delete ui;
-            break;
+void min_ui::err(const std::string& body) {
+    std::cerr << body << std::endl;
+}
+void min_ui::err(const std::string& body, const std::string& head) {
+    std::cerr << head << std::endl << body << std::endl;
+}
+
+void min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
+    bool run = true;
+    while (run) {
+        switch (current) {
+            case tables_list::tourists: {
+                auto ui = new min_ui_main<tourist_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(tourists, current);
+                delete ui;
+                break;
+            }
+            case tables_list::tours: {
+                auto ui = new min_ui_main<tour_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(tours, current);
+                delete ui;
+                break;
+            }
+            case tables_list::employes: {
+                auto ui = new min_ui_main<employe_t>;
+                ui->set_tables(tourists, tours, employes);
+                current = ui->main(employes, current);
+                delete ui;
+                break;
+            }
+            case tables_list::_quit:
+                run = false;
+                break;
         }
-        case tables_list::tours: {
-            auto ui = new min_ui_main<tour_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(tours, current);
-            delete ui;
-            break;
-        }
-        case tables_list::employes: {
-            auto ui = new min_ui_main<employe_t>;
-            ui->set_tables(tourists, tours, employes);
-            current = ui->main(employes, current);
-            delete ui;
-            break;
-        }
-        case tables_list::_quit:
-            return false;
-            break;
     }
-    return true;
 }
 
 bool min_ui::login() {
-    if (secure->need_login()) return true;
+    if (!secure->need_login()) return true;
     std::string input;
     db_id_t new_uid;
 
@@ -112,27 +126,13 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
                   << entry->town_from << '\t'
                   << entry->town_to << '\t'
                   << entry->date_start << '\t'
-                  << entry->date_end << '\t';
-        auto manager = employes_ptr->record_read(entry->manager);
-        if (manager != nullptr)
-            std::cout << "(" << entry->manager << ") " 
-            << manager->surname << ' '
-            << manager->name    << ' ' 
-            << manager->patronymic << '\t';
-        else
-            std::cout << "(" << entry->manager << ") Unknown" << '\t';
-
+                  << entry->date_end << '\t'
+                  << human_to_string(employes_ptr, entry->manager);
+        
         const auto count = entry->tourists.size();
         for (size_t i = 0; i < count; i++) {
-            auto t = tourists_ptr->record_read(i);
-            if (t != nullptr)
-                std::cout << "(" << i << ") " 
-                << t->surname << ' ' 
-                << t->name    << ' ' 
-                << t-> patronymic 
-                << "\n\t\t\t\t\t\t\t\t\t\t";
-            else
-                std::cout << "(" << i << ") Unknown";
+            std::cout << human_to_string(tourists_ptr, entry->tourists[i]);
+            std::cout << "\n\t\t\t\t\t\t\t\t\t\t";
         }
         std::cout << std::endl;
     }
@@ -351,3 +351,5 @@ bool min_ui::adduser(io_base<employe_t>* employes) {
     reg.role = roles_enum::chief;
     return secure->useradd(&reg);
 }
+
+#endif /* AZ_USE_MIN_UI */

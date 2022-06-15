@@ -1,36 +1,26 @@
 #ifndef __UI_MIN_H__
 #define __UI_MIN_H__
 
+#include "ui.h"
+
+#ifdef AZ_USE_MIN_UI
+
 #include <iostream>
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
-#include "../secure.h"
-#include "../db_base.h"
-#include "../config.h"
-
-enum class tables_list {
-    tourists,
-    tours,
-    employes,
-    _quit
-};
-
-enum class ui_actions {
-    record_create,
-    record_update,
-    record_delete,
-    switch_table,
-    quit
-};
-
-class min_ui {
+class min_ui : public ui_base {
 public:
     min_ui();
 
-    void msg(const std::string& msg);
-    bool main(db_base<tourist_t>* tourists, 
+    void msg(const std::string& body);
+    void msg(const std::string& body, const std::string& head);
+
+    void err(const std::string& body);
+    void err(const std::string& body, const std::string& head);
+
+    void main(db_base<tourist_t>* tourists, 
               db_base<tour_t>* tours,
               db_base<employe_t>* employes);
     
@@ -100,14 +90,11 @@ tables_list min_ui_main<T>::main(db_base<T>* table, const tables_list current) {
     table_print(table);
     switch (print_menu()) {
     case ui_actions::record_create:
-        record_create(table);
-        break;
+        record_create(table); break;
     case ui_actions::record_update:
-        record_update(table);
-        break;
+        record_update(table); break;
     case ui_actions::record_delete:
-        record_delete(table);
-        break;
+        record_delete(table); break;
     case ui_actions::switch_table:
         return switch_table();
     case ui_actions::quit:
@@ -168,5 +155,7 @@ void min_ui_main<T>::record_delete(db_base<T>* table) {
     }
     else std::cout << "No such record." << std::endl;
 }
+
+#endif /* AZ_USE_MIN_UI */
 
 #endif /* __UI_MIN_H__ */

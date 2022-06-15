@@ -3,6 +3,7 @@
 
 #include "base.h"
 #include "io.h"
+#include "db_base.h"
 
 enum class crud_actions {
 	create,
@@ -32,6 +33,8 @@ private:
 
 	void _login(const employe_t* user);
 };
+
+extern secure_ctl* secure;
 
 template <class T>
 class secure_check {

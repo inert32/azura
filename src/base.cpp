@@ -3,6 +3,11 @@
 
 #include "base.h"
 
+std::string purify_buf(const std::string& buf) {
+    std::string out = buf.substr(buf.find_first_not_of(' '));
+    return out.substr(0, out.find_first_of(' '));
+}
+
 const bool operator>(const date& d1, const date& d2) {
     if (d1.year > d2.year) return false;
     if (d1.month > d2.month) return false;
@@ -73,6 +78,10 @@ bool date::validate() {
        return false;
     }
     return true;
+}
+
+std::string date::to_string() {
+    return std::to_string(day) + '.' + std::to_string(month) + '.' + std::to_string(year);
 }
 
 std::string role_pretty(const roles_enum role) {

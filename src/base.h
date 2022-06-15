@@ -14,6 +14,8 @@ enum class roles_enum {
 };
 
 std::string role_pretty(const roles_enum role);
+// Clean buffer from spaces at the start and the end
+std::string purify_buf(const std::string& buf);
 
 class date {
 public:
@@ -22,6 +24,7 @@ public:
     date(unsigned short day, unsigned short month, int year);
     void set(std::string str);
     void set(unsigned short day, unsigned short month, int year);
+    std::string to_string();
 
     bool validate();
 
