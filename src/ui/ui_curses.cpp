@@ -62,7 +62,7 @@ void curses_ui::msg(const std::string& body, const std::string& head) {
     auto w = new curses_subwin(head);
     auto wnd = w->get_raw();
     
-    mvwprintw(wnd, 1, 1, body);
+    mvwprintw(wnd, 1, 2, body);
     wrefresh(wnd);
     getch();
     delete w;
@@ -76,7 +76,7 @@ void curses_ui::err(const std::string& body, const std::string& head) {
     auto w = new curses_subwin(head, tty_colors_entry_corrupted);
     auto wnd = w->get_raw();
     
-    mvwprintw(wnd, 1, 1, body);
+    mvwprintw(wnd, 1, 2, body);
     wrefresh(wnd);
     getch();
     delete w;
@@ -125,6 +125,8 @@ bool curses_ui::login() {
 
     auto window = new curses_subwin("Login");
     auto raw = window->get_raw();
+    mvwprintw(raw, 2, 2, "Azura v" + std::to_string(AZ_VER_MAJOR) + "." + 
+    std::to_string(AZ_VER_MINOR) + "." + std::to_string(AZ_VER_PATCH));
     mvwprintw(raw, 4, 2, AZ_LOC_TAB_ID);
     mvwprintw(raw, 8, 2, AZ_LOC_TAB_PASSWD);
     FIELD* fields[3] = { new_field(1, 20, 2, 12, 0, 0), new_field(1, 20, 6, 12, 0, 0), nullptr };

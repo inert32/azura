@@ -73,7 +73,17 @@ std::filesystem::path employes_file_path = "employes.txt";
 secure_ctl* secure = nullptr;
 ui_base* ui_global = nullptr;
 
-void parse_cli(int argc, char** argv) {}
+void parse_cli(int argc, char** argv) {
+    for (int i = 1; i < argc; i++) {
+        std::string buf(argv[i]);
+        std::string option = buf.substr(0, buf.find('='));
+        std::string value = buf.substr(buf.find('=') + 1);
+
+        if (option == "tourists") tourists_file_path = std::filesystem::absolute(option);
+        if (option == "tours") tours_file_path = std::filesystem::absolute(option);
+        if (option == "employes") employes_file_path = std::filesystem::absolute(option);
+    }
+}
 
 std::string human_to_string(db_base<employe_t>* table, const db_id_t id) {
     std::string out = "(" + std::to_string(id) + ") ";
