@@ -167,7 +167,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
     _mk_tables();
     while (true) {
         WINDOW* actions = newwin(1, tty_width, tty_heigth - 1, 0);
-        wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit  " + std::to_string(secure->get_uid()));
+        wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit  || Logged in as " + secure->uname());
         wnoutrefresh(actions);
         auto low_border = _fill_tables(table); // Used only in tour_t because of entries size
         for (int i = 0; i < 7; i++) {
