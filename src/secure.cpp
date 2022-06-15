@@ -34,7 +34,7 @@ void secure_ctl::_login(const employe_t* user) {
 	uid = user->metadata.id;
 	rid = user->role;
 	logged_in = true;
-	username = user->surname + ' ' + user->name + ' ' + user->patronymic;
+	username = purify_buf(user->surname) + ' ' + purify_buf(user->name) + ' ' + purify_buf(user->patronymic);
 }
 
 bool secure_ctl::need_admin() {

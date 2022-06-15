@@ -141,7 +141,7 @@ bool curses_ui::login() {
             std::string uid_buf(field_buffer(fields[0], 0));
             uid = std::stoull(uid_buf);
             passwd = field_buffer(fields[1], 0);
-            purify_buf(passwd);
+            passwd = purify_buf(passwd);
         }
         catch (const std::exception& e) {
             return false;
@@ -153,10 +153,6 @@ bool curses_ui::login() {
     for (int i = 0; i < 3; i++) free_field(fields[i]);
     delete window;
     return secure->login(uid, passwd);
-}
-
-bool curses_ui::adduser(io_base<employe_t>* employes) {
-    return false;
 }
 
 curses_subwin::curses_subwin(const std::string& title, const int color) {
@@ -304,9 +300,9 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
                 case 2: 
                     new_data->patronymic = buf; break;
                 case 3:
-                    new_data->passport_number = std::stoul(buf); break;
-                case 4:
                     new_data->passport_series = std::stoul(buf); break;
+                case 4:
+                    new_data->passport_number = std::stoul(buf); break;
                 case 5:
                     new_data->phone_number = std::stoull(buf); break;
                 }
@@ -640,6 +636,18 @@ bool _form_control(FORM* form, WINDOW* wnd) {
         form_driver(form, REQ_VALIDATION);
     }
     return send_away;
+}
+
+bool curses_ui::adduser(io_base<employe_t>* employes) {
+    auto ui = new curses_ui_main<employe_t>;
+    employe_t reg;
+    bool out = ui->create_record(&reg, nullptr);
+    delete ui;
+    if (out == false) return false;
+    reg.role = roles_enum::chief;
+    prettify_records<employe_t> p;
+    p.prettyify(&reg);
+    return secure->useradd(&reg);
 }
 
 #endif /* AZ_USE_CURSES_UI */

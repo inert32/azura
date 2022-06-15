@@ -11,7 +11,7 @@ bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            purify_buf(buf);
+            buf = purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
@@ -56,7 +56,7 @@ bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            purify_buf(buf);
+            buf = purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
@@ -107,7 +107,7 @@ bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
     try {
         while (field < 7) {
             buf = str.substr(left, right - left);
-            purify_buf(buf);
+            buf = purify_buf(buf);
             if (buf.empty()) is_good = false;
             switch (field) {
             case 0:
