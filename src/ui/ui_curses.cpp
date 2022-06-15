@@ -153,7 +153,7 @@ bool curses_ui::login() {
     free_form(form);
     for (int i = 0; i < 3; i++) free_field(fields[i]);
     delete window;
-    return currect && secure->login(uid, passwd);
+    return correct && secure->login(uid, passwd);
 }
 
 curses_subwin::curses_subwin(const std::string& title, const int color) {
