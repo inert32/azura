@@ -134,8 +134,9 @@ bool curses_ui::login() {
     prep_form(form);
     mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
 
-    db_id_t uid; std::string passwd;
+    db_id_t uid = -1; std::string passwd;
     bool send_away = _form_control(form, raw);
+    bool correct = true;
     if (send_away) { // Save data
         try {
             std::string uid_buf(field_buffer(fields[0], 0));
@@ -144,7 +145,7 @@ bool curses_ui::login() {
             passwd = purify_buf(passwd);
         }
         catch (const std::exception& e) {
-            return false;
+            correct = false;
         }
     }
     // cleanup
@@ -152,7 +153,7 @@ bool curses_ui::login() {
     free_form(form);
     for (int i = 0; i < 3; i++) free_field(fields[i]);
     delete window;
-    return secure->login(uid, passwd);
+    return currect && secure->login(uid, passwd);
 }
 
 curses_subwin::curses_subwin(const std::string& title, const int color) {
