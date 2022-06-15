@@ -105,8 +105,40 @@ void curses_ui::main(db_base<tourist_t>* tourists,
 }
     
 bool curses_ui::login() {
-    return true;
+    if (!secure->need_login()) return true;
+
+    auto window = new curses_subwin("Login");
+    auto raw = window->get_raw();
+    mvwprintw(raw, 2, 2, AZ_LOC_TAB_ID);
+    mvwprintw(raw, 6, 2, AZ_LOC_TAB_PASSWD);
+    FIELD* fields[3] = { new_field(1, 20, 2, 12, 0, 0), new_field(1, 20, 6, 12, 0, 0), nullptr };
+    set_field_back(fields[0], A_UNDERLINE);
+    set_field_back(fields[1], A_UNDERLINE);
+    FORM* form = new_form(fields);
+    prep_form(form);
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
+
+    db_id_t uid; std::string passwd;
+    bool send_away = _form_control(form, raw);
+    if (send_away) { // Save data
+        try {
+            std::string uid_buf(field_buffer(fields[0], 0));
+            uid = std::stoull(uid_buf);
+            passwd = field_buffer(fields[1], 0);
+            purify_buf(passwd);
+        }
+        catch (const std::exception& e) {
+            return false;
+        }
+    }
+    // cleanup
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 3; i++) free_field(fields[i]);
+    delete window;
+    return secure->login(uid, passwd);
 }
+
 bool curses_ui::adduser(io_base<employe_t>* employes) {
     return false;
 }
@@ -561,6 +593,35 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
     free_form(form);
     for (int i = 0; i < 5; i++) free_field(fields[i]);
     delete window;
+    return send_away;
+}
+
+bool _form_control(FORM* form, WINDOW* wnd) {
+    bool run = true;
+    bool send_away = false;
+    while (run) {
+        form_driver(form, REQ_END_LINE);
+        wrefresh(wnd);
+        switch (int ch = getch()) {
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD); break;
+        case KEY_DOWN:
+            form_driver(form, REQ_NEXT_FIELD); break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            send_away = true;
+            break;
+        case 27: // Escape key
+            run = false; break;
+        case KEY_BACKSPACE:
+            form_driver(form, REQ_CLR_FIELD); break;
+        default: 
+            form_driver(form, ch); break;
+        }
+        form_driver(form, REQ_VALIDATION);
+    }
     return send_away;
 }
 

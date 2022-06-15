@@ -59,7 +59,7 @@ void min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<
 }
 
 bool min_ui::login() {
-    if (secure->need_login()) return true;
+    if (!secure->need_login()) return true;
     std::string input;
     db_id_t new_uid;
 

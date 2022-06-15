@@ -32,8 +32,11 @@ int main(int argc, char** argv) {
         secure = new secure_ctl(employes_io);
         if (secure->need_admin()) ui_global->adduser(employes_io);
 		else if (!ui_global->login()) {
-			std::cout << "Login failed." << std::endl;
-			return -1;
+			ui_global->msg("Login failed");
+
+            delete employes_io;
+			delete ui_global;
+            delete secure;
 		}
         auto employes = new db_base<employe_t>(employes_io);
 

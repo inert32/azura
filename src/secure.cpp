@@ -5,9 +5,9 @@
 
 secure_ctl::secure_ctl(io_base<employe_t>* io) {
     _io = io;
-    logged_in = true;
-    uid = 0;
-    rid = roles_enum::chief;
+    logged_in = false;
+    uid = -1;
+    rid = roles_enum::guide;
 }
 
 db_id_t secure_ctl::get_uid() {
@@ -42,7 +42,7 @@ bool secure_ctl::need_admin() {
 }
 
 bool secure_ctl::need_login() {
-    return logged_in;
+    return !logged_in;
 }
 
 bool secure_ctl::useradd(const employe_t* user) {

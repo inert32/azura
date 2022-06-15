@@ -21,6 +21,8 @@ enum tty_colors {
 int mvwprintw(WINDOW *win, int y, int x, const std::string& fmt);
 int wprintw(WINDOW *win, const std::string& fmt);
 
+bool _form_control(FORM* form, WINDOW* wnd);
+
 class curses_ui : public ui_base {
 public:
     curses_ui();
@@ -62,7 +64,6 @@ private:
     size_t _fill_tables(db_base<T>* origin);
     void _mk_tables_headers();
     unsigned int* _calc_table_width();
-    bool _form_control(FORM* form, WINDOW* wnd);
     WINDOW* ui_table[7] = { nullptr };
     WINDOW* ui_head[7] = { nullptr };
     db_id_t current_id = 0; // Selected entry
@@ -161,7 +162,7 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
     _mk_tables();
     while (true) {
         WINDOW* actions = newwin(1, tty_width, tty_heigth - 1, 0);
-        wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit");
+        wprintw(actions, "F1 New | F2 Edit | F3 Delete | F9 Switch table | F10 Quit  " + std::to_string(secure->get_uid()));
         wnoutrefresh(actions);
         auto low_border = _fill_tables(table); // Used only in tour_t because of entries size
         for (int i = 0; i < 7; i++) {
@@ -257,36 +258,6 @@ void curses_ui_main<T>::record_delete(db_base<T>* table) {
     for (int i = 0; i < 3; i++) free_item(items[i]);
     delete wnd;
     if (ret) table->record_delete(current_id);
-}
-
-template<class T>
-bool curses_ui_main<T>::_form_control(FORM* form, WINDOW* wnd) {
-    bool run = true;
-    bool send_away = false;
-    while (run) {
-        form_driver(form, REQ_END_LINE);
-        wrefresh(wnd);
-        switch (int ch = getch()) {
-        case KEY_UP:
-            form_driver(form, REQ_PREV_FIELD); break;
-        case KEY_DOWN:
-            form_driver(form, REQ_NEXT_FIELD); break;
-        case '\n':
-        case '\r':
-        case KEY_ENTER:
-            run = false;
-            send_away = true;
-            break;
-        case 27: // Escape key
-            run = false; break;
-        case KEY_BACKSPACE:
-            form_driver(form, REQ_CLR_FIELD); break;
-        default: 
-            form_driver(form, ch); break;
-        }
-        form_driver(form, REQ_VALIDATION);
-    }
-    return send_away;
 }
 
 #endif /* AZ_USE_CURSES_UI */

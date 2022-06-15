@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+#define purify_buf(buf) \
+    (buf) = (buf).substr((buf).find_first_not_of(' ')); \
+    (buf) = (buf).substr(0, (buf).find_first_of(' '));
+
 typedef unsigned long long int db_id_t;
 
 enum class roles_enum {

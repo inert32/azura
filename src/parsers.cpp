@@ -3,10 +3,6 @@
 #include "parsers.h"
 #include "config.h"
 
-#define purify_buf(buf) \
-    (buf) = (buf).substr((buf).find_first_not_of(' ')); \
-    (buf) = (buf).substr(0, (buf).find_first_of(' '));
-
 template<>
 bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
     std::string buf;
