@@ -38,11 +38,13 @@ curses_ui::curses_ui() {
         init_pair(tty_colors_entry_corrupted, COLOR_RED, COLOR_BLACK);
         init_pair(tty_colors_entry_sel, COLOR_BLACK, COLOR_WHITE);
         init_pair(tty_colors_title, COLOR_GREEN, COLOR_BLACK);
+        init_pair(tty_colors_title_error, COLOR_GREEN, COLOR_BLACK);
     }
     else {
         init_pair(tty_colors_entry_corrupted, COLOR_BLACK, COLOR_WHITE);
         init_pair(tty_colors_entry_sel, COLOR_BLACK, COLOR_WHITE);
         init_pair(tty_colors_title, COLOR_WHITE, COLOR_BLACK);
+        init_pair(tty_colors_title_error, COLOR_GREEN, COLOR_BLACK);
     }
     current = tables_list::tourists;
     tty_heigth = LINES;
@@ -68,6 +70,20 @@ void curses_ui::msg(const std::string& body, const std::string& head) {
 
 void curses_ui::msg(const std::string& body) {
     msg(body, "Message");
+}
+
+void curses_ui::err(const std::string& body, const std::string& head) {
+    auto w = new curses_subwin(head, tty_colors_entry_corrupted);
+    auto wnd = w->get_raw();
+    
+    mvwprintw(wnd, 1, 1, body);
+    wrefresh(wnd);
+    getch();
+    delete w;
+}
+
+void curses_ui::err(const std::string& body) {
+    err(body, "Message");
 }
 
 void curses_ui::main(db_base<tourist_t>* tourists, 
@@ -109,8 +125,8 @@ bool curses_ui::login() {
 
     auto window = new curses_subwin("Login");
     auto raw = window->get_raw();
-    mvwprintw(raw, 2, 2, AZ_LOC_TAB_ID);
-    mvwprintw(raw, 6, 2, AZ_LOC_TAB_PASSWD);
+    mvwprintw(raw, 4, 2, AZ_LOC_TAB_ID);
+    mvwprintw(raw, 8, 2, AZ_LOC_TAB_PASSWD);
     FIELD* fields[3] = { new_field(1, 20, 2, 12, 0, 0), new_field(1, 20, 6, 12, 0, 0), nullptr };
     set_field_back(fields[0], A_UNDERLINE);
     set_field_back(fields[1], A_UNDERLINE);
@@ -143,39 +159,40 @@ bool curses_ui::adduser(io_base<employe_t>* employes) {
     return false;
 }
 
-curses_subwin::curses_subwin(const std::string& title) {
+curses_subwin::curses_subwin(const std::string& title, const int color) {
     wnd = newwin(heigth, width, start_y, start_x);
+    wattron(wnd, COLOR_PAIR(color));
     box(wnd, 0, 0);
-    wattron(wnd, COLOR_PAIR(tty_colors_title));
     mvwprintw(wnd, 0, 2, title);
-    wattroff(wnd, COLOR_PAIR(tty_colors_title));
+    wattroff(wnd, COLOR_PAIR(color));
     wrefresh(wnd);
 }
-curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx) {
+
+curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx, const int color) {
     heigth = lines;
     width = cols;
     start_x = startx;
     start_y = starty;
 
     wnd = newwin(heigth, width, start_y, start_x);
-    wattron(wnd, COLOR_PAIR(tty_colors_title));
+    wattron(wnd, COLOR_PAIR(color));
     box(wnd, 0, 0);
     mvwprintw(wnd, 0, 2, title);
+    wattroff(wnd, COLOR_PAIR(color));
     wrefresh(wnd);
-    wattroff(wnd, COLOR_PAIR(tty_colors_title));
 }
-curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols) {
+curses_subwin::curses_subwin(const std::string& title, size_t lines, size_t cols, const int color) {
     heigth = lines;
     width = cols;
     start_x = (tty_width - cols) / 2;
     start_y = (tty_heigth - lines) / 2;
 
     wnd = newwin(heigth, width, start_y, start_x);
-    wattron(wnd, COLOR_PAIR(tty_colors_title));
+    wattron(wnd, COLOR_PAIR(color));
     box(wnd, 0, 0);
     mvwprintw(wnd, 0, 2, title);
+    wattroff(wnd, COLOR_PAIR(color));
     wrefresh(wnd);
-    wattroff(wnd, COLOR_PAIR(tty_colors_title));
 }
 
 curses_subwin::~curses_subwin() {

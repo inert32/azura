@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
         secure = new secure_ctl(employes_io);
         if (secure->need_admin()) ui_global->adduser(employes_io);
 		else if (!ui_global->login()) {
-			ui_global->msg("Login failed");
+			ui_global->err("Login failed");
 
             delete employes_io;
 			delete ui_global;
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
         delete employes_io;
     }
     catch (const std::exception &e) {
-       ui_global->msg(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
+       ui_global->err(AZ_LOC_ERR_EXCEPTION + ' '  + e.what());
     }
 
     delete ui_global;

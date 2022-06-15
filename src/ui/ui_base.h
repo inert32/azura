@@ -25,6 +25,9 @@ public:
 
     virtual void msg(const std::string& body) = 0;
     virtual void msg(const std::string& body, const std::string& head) = 0;
+
+    virtual void err(const std::string& body) = 0;
+    virtual void err(const std::string& body, const std::string& head) = 0;
     
     virtual void main(db_base<tourist_t>* tourists, 
                       db_base<tour_t>* tours,

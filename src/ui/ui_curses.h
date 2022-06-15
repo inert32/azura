@@ -14,7 +14,8 @@ enum tty_colors {
     _null,
     tty_colors_entry_sel,
     tty_colors_entry_corrupted,
-    tty_colors_title
+    tty_colors_title,
+    tty_colors_title_error
 };
 
 // std::string wrappers for ncurses API
@@ -30,6 +31,10 @@ public:
 
     void msg(const std::string& body);
     void msg(const std::string& body, const std::string& head);
+
+    void err(const std::string& body);
+    void err(const std::string& body, const std::string& head);
+
     void main(db_base<tourist_t>* tourists, 
               db_base<tour_t>* tours,
               db_base<employe_t>* employes);
@@ -72,9 +77,9 @@ private:
 
 class curses_subwin {
 public:
-    curses_subwin(const std::string& title);
-    curses_subwin(const std::string& title, size_t lines, size_t cols);
-    curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx);
+    curses_subwin(const std::string& title, const int color = tty_colors_title);
+    curses_subwin(const std::string& title, size_t lines, size_t cols, const int color = tty_colors_title);
+    curses_subwin(const std::string& title, size_t lines, size_t cols, size_t starty, size_t startx, const int color = tty_colors_title);
     ~curses_subwin();
 
     WINDOW* get_raw();

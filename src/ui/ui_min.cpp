@@ -26,6 +26,13 @@ void min_ui::msg(const std::string& body, const std::string& head) {
     std::cout << head << std::endl << body << std::endl;
 }
 
+void min_ui::err(const std::string& body) {
+    std::cerr << body << std::endl;
+}
+void min_ui::err(const std::string& body, const std::string& head) {
+    std::cerr << head << std::endl << body << std::endl;
+}
+
 void min_ui::main(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes) {
     bool run = true;
     while (run) {
