@@ -57,10 +57,12 @@ private:
     db_base<tour_t>* tours_ptr = nullptr;
     db_base<employe_t>* employes_ptr = nullptr;
 
+    // Internal helper fuctions
     void _mk_tables();
     size_t _fill_tables(db_base<T>* origin);
     void _mk_tables_headers();
     unsigned int* _calc_table_width();
+    bool _form_control(FORM* form, WINDOW* wnd);
     WINDOW* ui_table[7] = { nullptr };
     WINDOW* ui_head[7] = { nullptr };
     db_id_t current_id = 0; // Selected entry
@@ -78,7 +80,6 @@ public:
 
     void get_start_pos(size_t *y, size_t *x);
     void get_size(size_t *y, size_t *x);
-    void print(const std::string& text, size_t y = 1, size_t x = 1);
 private:
     size_t heigth = tty_heigth_subwin;
     size_t width = tty_width_subwin;
@@ -128,16 +129,13 @@ tables_list curses_ui_main<T>::switch_table(const tables_list current) {
         wrefresh(raw);
         switch (ch = getch()) {
         case KEY_UP:
-            menu_driver(menu, REQ_UP_ITEM);
-            break;
+            menu_driver(menu, REQ_UP_ITEM); break;
         case KEY_DOWN:
-            menu_driver(menu, REQ_DOWN_ITEM);
-            break;
+            menu_driver(menu, REQ_DOWN_ITEM); break;
         case '\n':
         case '\r':
         case KEY_ENTER:
-            run = false;
-            break;
+            run = false; break;
         case 27: // Escape key
             ret = current;
             run = false;
@@ -174,17 +172,14 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
         delwin(actions);
         switch (auto c = getch())
         case KEY_F(1): {
-            record_create(table);
-            break;
+            record_create(table); break;
         case '\n':
         case '\r':
         case KEY_ENTER:
         case KEY_F(2):
-            record_update(table);
-            break;
+            record_update(table); break;
         case KEY_F(3):
-            record_delete(table);
-            break;
+            record_delete(table); break;
         case KEY_F(9):
             return switch_table(current);
         case KEY_UP: {
@@ -242,16 +237,13 @@ void curses_ui_main<T>::record_delete(db_base<T>* table) {
         wrefresh(raw);
         switch (ch = getch()) {
         case KEY_UP:
-            menu_driver(menu, REQ_UP_ITEM);
-            break;
+            menu_driver(menu, REQ_UP_ITEM); break;
         case KEY_DOWN:
-            menu_driver(menu, REQ_DOWN_ITEM);
-            break;
+            menu_driver(menu, REQ_DOWN_ITEM); break;
         case '\n':
         case '\r':
         case KEY_ENTER:
-            run = false;
-            break;
+            run = false; break;
         case 27: // Escape key
             run = false;
             escape = true; // Additional protection, since escape can be pressed at 'Yes' option
@@ -265,6 +257,36 @@ void curses_ui_main<T>::record_delete(db_base<T>* table) {
     for (int i = 0; i < 3; i++) free_item(items[i]);
     delete wnd;
     if (ret) table->record_delete(current_id);
+}
+
+template<class T>
+bool curses_ui_main<T>::_form_control(FORM* form, WINDOW* wnd) {
+    bool run = true;
+    bool send_away = false;
+    while (run) {
+        form_driver(form, REQ_END_LINE);
+        wrefresh(wnd);
+        switch (int ch = getch()) {
+        case KEY_UP:
+            form_driver(form, REQ_PREV_FIELD); break;
+        case KEY_DOWN:
+            form_driver(form, REQ_NEXT_FIELD); break;
+        case '\n':
+        case '\r':
+        case KEY_ENTER:
+            run = false;
+            send_away = true;
+            break;
+        case 27: // Escape key
+            run = false; break;
+        case KEY_BACKSPACE:
+            form_driver(form, REQ_CLR_FIELD); break;
+        default: 
+            form_driver(form, ch); break;
+        }
+        form_driver(form, REQ_VALIDATION);
+    }
+    return send_away;
 }
 
 #endif /* AZ_USE_CURSES_UI */

@@ -9,6 +9,14 @@ unsigned int tty_width;
 unsigned int tty_heigth_subwin;
 unsigned int tty_width_subwin;
 
+// Utility macros to create form
+#define prep_form(form) \
+    int y = 0, x = 0; \
+    scale_form((form), &y, &x); \
+    set_form_win((form), raw); \
+    set_form_sub((form), derwin(raw, y, x, 2, 20)); \
+    post_form((form)); \
+
 int mvwprintw(WINDOW *win, int y, int x, const std::string& fmt) {
     return mvwprintw(win, y, x, fmt.c_str());
 }
@@ -156,11 +164,6 @@ void curses_subwin::get_size(size_t *y, size_t *x) {
     *x = width;
 }
 
-void curses_subwin::print(const std::string& text, size_t y, size_t x) {
-    mvwprintw(wnd, y, x, text);
-    wrefresh(wnd);
-}
-
 template<>
 unsigned int *curses_ui_main<tourist_t>::_calc_table_width() {
     unsigned int* val = new unsigned int[7];
@@ -173,13 +176,13 @@ unsigned int *curses_ui_main<tourist_t>::_calc_table_width() {
 template<>
 size_t curses_ui_main<tourist_t>::_fill_tables(db_base<tourist_t>* origin) {
     size_t y_offset = 0;
-    for (int i = 0; i < 7; i++) wclear(ui_table[i]);
+    for (int i = 0; i < 7; i++) werase(ui_table[i]);
     for (db_id_t i = top_id; i < tty_heigth + top_id - 2; i++) {
         auto entry = origin->record_read(i);
         if (entry == nullptr) break;
         int c = 0;
         if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
-        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+        if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
 
         if (c != 0) for (int i = 0; i < 7; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
@@ -214,72 +217,32 @@ bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* ol
     for (int i = 0; i < 6; i++) {
         mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i + 1]);
         fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        set_field_back(fields[i], A_UNDERLINE);
         if (old_data != nullptr) {
             switch (i) {
             case 0:
-                set_field_buffer(fields[i], 0, old_data->surname.c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->surname.c_str()); break;
             case 1:
-                set_field_buffer(fields[i], 0, old_data->name.c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->name.c_str()); break;
             case 2:
-                set_field_buffer(fields[i], 0, old_data->patronymic.c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->patronymic.c_str()); break;
             case 3:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_series).c_str());
-                break;
+                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_series).c_str()); break;
             case 4:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_number).c_str());
-                break;
+                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_number).c_str()); break;
             case 5:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str());
-                break;
+                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str()); break;
             }
         }
     }
     fields[6] = nullptr;
     FORM* form = new_form(fields);
-    int y = 0, x = 0;
-    scale_form(form, &y, &x);
-    set_form_win(form, raw);
-    set_form_sub(form, derwin(raw, y, x, 2, 20));
-    post_form(form);
+    prep_form(form);
     if (old_data != nullptr)
         mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
-    wrefresh(raw);
-    bool run = true;
-    bool send_away = false;
     mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
-    while (run) {
-        form_driver(form, REQ_END_LINE);
-        wrefresh(raw);
-        switch (int ch = getch()) {
-        case KEY_UP:
-            form_driver(form, REQ_PREV_FIELD);
-            form_driver(form, REQ_END_LINE);
-            break;
-        case KEY_DOWN:
-            form_driver(form, REQ_NEXT_FIELD);
-            form_driver(form, REQ_END_LINE);
-            break;
-        case '\n':
-        case '\r':
-        case KEY_ENTER:
-            run = false;
-            send_away = true;
-            break;
-        case 27: // Escape key
-            run = false;
-            break;
-        case KEY_BACKSPACE:
-            form_driver(form, REQ_CLR_FIELD);
-            break;
-        default: 
-            form_driver(form, ch);
-            break;
-        }
-        form_driver(form, REQ_VALIDATION);
-    }
+
+    bool send_away = _form_control(form, raw);
     if (send_away) { // Save data
         for (int i = 0; i < 6; i++) {
             try {
@@ -331,7 +294,7 @@ size_t curses_ui_main<tour_t>::_fill_tables(db_base<tour_t>* origin) {
         if (entry == nullptr) break;
         int c = 0;
         if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
-        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+        if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
 
         if (c != 0) for (int i = 0; i < 7; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
@@ -371,23 +334,19 @@ bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
     for (int i = 0; i < 6; i++) {
         mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOUR_T[i + 1]);
         fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        set_field_back(fields[i], A_UNDERLINE);
         if (old_data != nullptr) {
             switch (i) {
             case 0:
-                set_field_buffer(fields[i], 0, old_data->town_from.c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->town_from.c_str()); break;
             case 1:
-                set_field_buffer(fields[i], 0, old_data->town_to.c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->town_to.c_str()); break;
             case 2:
-                set_field_buffer(fields[i], 0, old_data->date_start.to_string().c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->date_start.to_string().c_str()); break;
             case 3:
-                set_field_buffer(fields[i], 0, old_data->date_end.to_string().c_str());
-                break;
+                set_field_buffer(fields[i], 0, old_data->date_end.to_string().c_str()); break;
             case 4:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->manager).c_str());
-                break;
+                set_field_buffer(fields[i], 0, std::to_string(old_data->manager).c_str()); break;
             case 5: {
                 std::string str;
                 for (auto &x : old_data->tourists) str += std::to_string(x) + ";";
@@ -400,44 +359,12 @@ bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
     }
     fields[6] = nullptr;
     FORM* form = new_form(fields);
-    int y = 0, x = 0;
-    scale_form(form, &y, &x);
-    set_form_win(form, raw);
-    set_form_sub(form, derwin(raw, y, x, 2, 20));
-    post_form(form);
+    prep_form(form);
     if (old_data != nullptr)
         mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
-    wrefresh(raw);
-    bool run = true, send_away = false;
     mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
-    while (run) {
-        form_driver(form, REQ_END_LINE);
-        wrefresh(raw);
-        switch (int ch = getch()) {
-        case KEY_UP:
-            form_driver(form, REQ_PREV_FIELD);
-            break;
-        case KEY_DOWN:
-            form_driver(form, REQ_NEXT_FIELD);
-            break;
-        case '\n':
-        case '\r':
-        case KEY_ENTER:
-            run = false;
-            send_away = true;
-            break;
-        case 27: // Escape key
-            run = false;
-            break;
-        case KEY_BACKSPACE:
-            form_driver(form, REQ_CLR_FIELD);
-            break;
-        default: 
-            form_driver(form, ch);
-            break;
-        }
-        form_driver(form, REQ_VALIDATION);
-    }
+
+    bool send_away = _form_control(form, raw);
     if (send_away) { // Save data
         for (int i = 0; i < 6; i++) {
             try {
@@ -457,6 +384,7 @@ bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
                     for (auto &c : buf) if (c == ',' || c == ' ') c = ';';
                     parsers<tour_t> parser; 
                     parser.parse_tourists_count(buf, &new_data->tourists);
+                    break;
                 }
                 }
             }
@@ -491,7 +419,7 @@ size_t curses_ui_main<employe_t>::_fill_tables(db_base<employe_t>* origin) {
         if (entry == nullptr) break;
         int c = 0;
         if (entry->metadata.corrupt) c = tty_colors_entry_corrupted;
-        else if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
+        if (entry->metadata.id == current_id) c = tty_colors_entry_sel;
 
         if (c != 0) for (int i = 0; i < 6; i++) wattron(ui_table[i], COLOR_PAIR(c));
         mvwprintw(ui_table[0], y_offset, 0, std::to_string(entry->metadata.id));
@@ -526,6 +454,7 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
     for (int i = 0; i < 5; i++) {
         mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[i + 1]);
         fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        set_field_back(fields[i], A_UNDERLINE);
         if (old_data != nullptr) {
             switch (i) {
             case 0:
@@ -547,14 +476,9 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
             role = old_data->role;
         }
     }
-
     fields[5] = nullptr;
     FORM* form = new_form(fields);
-    int y = 0, x = 0;
-    scale_form(form, &y, &x);
-    set_form_win(form, raw);
-    set_form_sub(form, derwin(raw, y, x, 2, 20));
-    post_form(form);
+    prep_form(form);
 
     if (old_data != nullptr)
         mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
@@ -570,21 +494,15 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
         wrefresh(raw);
         switch (int ch = getch()) {
         case KEY_UP:
-            form_driver(form, REQ_PREV_FIELD);
-            form_driver(form, REQ_END_LINE);
-            break;
+            form_driver(form, REQ_PREV_FIELD); break;
         case KEY_DOWN:
-            form_driver(form, REQ_NEXT_FIELD);
-            form_driver(form, REQ_END_LINE);
-            break;
+            form_driver(form, REQ_NEXT_FIELD); break;
         case KEY_LEFT: {
             switch (role) {
             case roles_enum::manager:
-                role = roles_enum::guide;
-                break;
+                role = roles_enum::guide; break;
             case roles_enum::chief:
-                role = roles_enum::manager;
-                break;
+                role = roles_enum::manager; break;
             default: break;
             }
             break;
@@ -592,11 +510,9 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
         case KEY_RIGHT: {
             switch (role) {
             case roles_enum::guide:
-                role = roles_enum::manager;
-                break;
+                role = roles_enum::manager; break;
             case roles_enum::manager:
-                role = roles_enum::chief;
-                break;
+                role = roles_enum::chief; break;
             default: break;
             }
             break;
@@ -608,14 +524,11 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
             send_away = true;
             break;
         case 27: // Escape key
-            run = false;
-            break;
+            run = false; break;
         case KEY_BACKSPACE:
-            form_driver(form, REQ_CLR_FIELD);
-            break;
+            form_driver(form, REQ_CLR_FIELD); break;
         default: 
-            form_driver(form, ch);
-            break;
+            form_driver(form, ch); break;
         }
         form_driver(form, REQ_VALIDATION);
     }
