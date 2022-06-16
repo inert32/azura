@@ -123,6 +123,7 @@ ui_actions min_ui_main<T>::print_menu() {
 
 template<class T>
 void min_ui_main<T>::record_create(db_base<T>* table) {
+    _clean_input_buffer();
     auto rec = create_record();
     table->record_create(&rec);
 }
@@ -135,6 +136,7 @@ void min_ui_main<T>::record_update(db_base<T>* table) {
     auto old = table->record_read(id);
     if (old != nullptr) {
         std::cout << "Type '-' to enter old value" << std::endl;
+        _clean_input_buffer();
         auto rec = create_record(old);
         table->record_update(&rec, id);
     }

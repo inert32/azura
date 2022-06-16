@@ -22,6 +22,9 @@ public:
 protected:
     std::vector<T> arr;
     io_base<T>* io;
+
+    bool have_changed = false;
+    bool have_removed = true;
 };
 
 template<class T>
@@ -50,6 +53,7 @@ db_id_t db_base<T>::db_size() {
 
 template<class T>
 bool db_base<T>::db_sync() {
+    if (!have_changed && !have_removed) return true;
     for (auto &x : arr) {
 		io->write_record(&x, x.metadata.id);
 	}
@@ -79,6 +83,7 @@ bool db_base<T>::record_exists(const db_id_t id) {
 
 template<class T>
 bool db_base<T>::record_create(T* rec) {
+    have_changed = true;
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
     return true;
@@ -86,6 +91,8 @@ bool db_base<T>::record_create(T* rec) {
 
 template<class T>
 bool db_base<T>::record_delete(db_id_t id) {
+    have_changed = true;
+    have_removed = true;
     arr.erase(arr.begin() + id);
     const size_t new_size = arr.size();
     for (auto i = id; i < new_size; ++i)
@@ -95,6 +102,7 @@ bool db_base<T>::record_delete(db_id_t id) {
 
 template<class T>
 bool db_base<T>::record_update(const T* rec, const db_id_t id) {
+    have_changed = true;
     arr[id] = *rec;
     return true;
 }

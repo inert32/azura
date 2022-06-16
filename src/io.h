@@ -30,6 +30,8 @@ public:
 
     virtual void sync() = 0;
     virtual bool is_empty() = 0;
+
+    virtual void have_removed() = 0;
 };
 
 template<class T>
@@ -43,6 +45,8 @@ public:
     
     void sync();
     bool is_empty();
+
+    void have_removed();
 private:
     std::filesystem::path _file_path;
     std::fstream file_handle;
@@ -62,6 +66,13 @@ bool file_io<T>::is_empty() {
 }
 
 template<class T>
+void file_io<T>::have_removed() {
+	file_handle.close();
+    std::filesystem::remove(_file_path);
+    file_handle.open(_file_path, std::ios::in | std::ios::out | std::ios::binary);
+}
+
+template<class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
     _file_path = path;
 
@@ -72,8 +83,7 @@ file_io<T>::file_io(const std::filesystem::path& path) {
             // Recreating file
             file_handle.close();
             std::filesystem::remove(path);
-            file_handle.open(path.c_str(), std::ios::out);
-            file_handle.close();
+            file_handle.open(path.c_str(), std::ios::in | std::ios::out | std::ios::binary);
         }
         else break;
         tries++;

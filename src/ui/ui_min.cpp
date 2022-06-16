@@ -6,7 +6,7 @@
 
 void _clean_input_buffer() {
 	std::cin.clear();
-    std::cin.sync();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 min_ui::min_ui() {
@@ -171,10 +171,9 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
 
 template<>
 tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
-    _clean_input_buffer();
     tourist_t tmp;
     std::string buf;
-    std::cout << "Surname: ";
+    std::cout << AZ_LOC_TAB_SURNAME << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->surname << std::endl;
@@ -182,7 +181,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     }
     else tmp.surname = buf;
     
-    std::cout << "Name: ";
+    std::cout << AZ_LOC_TAB_NAME << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->name << std::endl;
@@ -190,7 +189,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     }
     else tmp.name = buf;
     
-    std::cout << "Patronymic: ";
+    std::cout << AZ_LOC_TAB_PATRONYMIC << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->patronymic << std::endl;
@@ -198,7 +197,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     }
     else tmp.patronymic = buf;
     
-    std::cout << "Passport series: ";
+    std::cout << AZ_LOC_TAB_PASSPORT_SERIES << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->passport_series << std::endl;
@@ -206,7 +205,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     }
     else tmp.passport_series = std::stoi(buf);
     
-    std::cout << "Passport number: ";
+    std::cout << AZ_LOC_TAB_PASSPORT_NUMBER << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->passport_number << std::endl;
@@ -214,7 +213,7 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
     }
     else tmp.passport_number = std::stoi(buf);
     
-    std::cout << "Phone number: ";
+    std::cout << AZ_LOC_TAB_PHONE_NUMBER << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
@@ -229,11 +228,10 @@ tourist_t min_ui_main<tourist_t>::create_record(tourist_t* old_data) {
 
 template<>
 tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
-    _clean_input_buffer();
     std::string buf;
     tour_t tmp;
 
-    std::cout << "Town from: ";
+    std::cout << AZ_LOC_TAB_TOWN_FROM << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->town_from << std::endl;
@@ -241,7 +239,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     }
     else tmp.town_from = buf;
     
-    std::cout << "Town to: ";
+    std::cout << AZ_LOC_TAB_TOWN_TO << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->town_to << std::endl;
@@ -249,7 +247,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     }
     else tmp.town_to = buf;
     
-    std::cout << "Start date: ";
+    std::cout << AZ_LOC_TAB_DATE_START << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->date_start << std::endl;
@@ -257,7 +255,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     }
     else tmp.date_start.set(buf);
     
-    std::cout << "End date: ";
+    std::cout << AZ_LOC_TAB_DATE_END << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->date_end << std::endl;
@@ -265,7 +263,7 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
     }
     else tmp.date_end.set(buf);
     
-    std::cout << "Manager: ";
+    std::cout << AZ_LOC_TAB_MANAGER << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->manager << std::endl;
@@ -292,10 +290,9 @@ tour_t min_ui_main<tour_t>::create_record(tour_t* old_data) {
 
 template<>
 employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
-    //_clean_input_buffer();
     employe_t tmp;
     std::string buf;
-    std::cout << "Surname: ";
+    std::cout << AZ_LOC_TAB_SURNAME << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->surname << std::endl;
@@ -303,7 +300,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     }
     else tmp.surname = buf;
     
-    std::cout << "Name: ";
+    std::cout << AZ_LOC_TAB_NAME << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->name << std::endl;
@@ -311,7 +308,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     }
     else tmp.name = buf;
     
-    std::cout << "Patronymic: ";
+    std::cout << AZ_LOC_TAB_PATRONYMIC << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->patronymic << std::endl;
@@ -319,7 +316,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     }
     else tmp.patronymic = buf;
     
-    std::cout << "Phone number: ";
+    std::cout << AZ_LOC_TAB_PHONE_NUMBER << ": ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->phone_number << std::endl;
@@ -335,10 +332,31 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
         tmp.role = old_data->role;
     }
     else {
-        tmp.role = (roles_enum)std::stoi(buf);
+        switch (buf[0]) {
+        case '0':
+        case '1':
+        case '2':
+            tmp.role = (roles_enum)std::stoi(buf);
+            break;
+        case 'G':
+        case 'g':
+            tmp.role = roles_enum::guide;
+            break;
+        case 'M':
+        case 'm':
+            tmp.role = roles_enum::manager;
+            break;
+        case 'C':
+        case 'c':
+            tmp.role = roles_enum::chief;
+            break;
+        default:
+            tmp.role = roles_enum::guide;
+            break;
+        }
     }
 
-    std::cout << "Password: ";
+    std::cout << AZ_LOC_TAB_PASSWD << ": ";
     std::cin >> buf;
     if (restore_old_value) {
         std::cout << "Field stays at " << old_data->passwd << std::endl;

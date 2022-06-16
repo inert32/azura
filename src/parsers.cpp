@@ -164,14 +164,14 @@ void prettify_records<employe_t>::prettyify(employe_t* record) {
 }
 
 std::string phone_to_str(const unsigned long long int number) {
-    std::string buf;
-    int part1 = number / 10000000;
-    int part2 = number % 10000000;
-    int part3 = part2 % 10000;
-    part2 = part2 / 10000;
-    buf += std::to_string(part1 / 1000) + " (" + std::to_string(part1 % 1000) + ") ";
-    buf += std::to_string(part2) + " " + std::to_string(part3 / 100) + '-' + std::to_string(part3 % 100);
-    return buf;
+    std::string base = std::to_string(number);
+    const auto len = base.length();
+    std::string part3 = base.substr(len - 2, 2);
+    std::string part2 = base.substr(len - 4, 2);
+    std::string part1 = base.substr(len - 7, 3);
+    std::string code = base.substr(len - 10, 3);
+    std::string country = base.substr(0, len - 10);
+    return country + " (" + code + ") " + part1 + '-' + part2 + '-' + part3;
 }
 
 unsigned long long int str_to_phone(const std::string& buf) {
