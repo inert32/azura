@@ -30,7 +30,7 @@ if (AZ_DEBUG OR CMAKE_BUILD_TYPE EQUAL "Debug")
     add_compile_definitions(AZ_DEBUG)
 endif()
 
-option (AZ_CURSES "Build curses UI" ON)
+option (AZ_CURSES "Build curses UI" OFF)
 if (AZ_CURSES)
     message(NOTICE "Build curses UI")
     add_compile_definitions(AZ_CURSES)

@@ -28,9 +28,15 @@ int main(int argc, char** argv) {
     parse_cli(argc, argv);
     ui_global = new current_ui();
     try {
-        auto employes_io = new file_io<employe_t>(std::filesystem::absolute(employes_file_path));
+        auto employes_io = new file_io<employe_t>(employes_file_path);
         secure = new secure_ctl(employes_io);
-        if (secure->need_admin()) ui_global->adduser(employes_io);
+        if (secure->need_admin() && !ui_global->adduser(employes_io)) {
+            ui_global->err("Registration failed");
+
+            delete employes_io;
+			delete ui_global;
+            delete secure;
+        }
 		else if (!ui_global->login()) {
 			ui_global->err("Login failed");
 
@@ -40,10 +46,10 @@ int main(int argc, char** argv) {
 		}
         auto employes = new db_base<employe_t>(employes_io);
 
-        auto tourists_io = new file_io<tourist_t>(std::filesystem::absolute(tourists_file_path));
+        auto tourists_io = new file_io<tourist_t>(tourists_file_path);
         auto tourists = new db_base<tourist_t>(tourists_io);
 
-        auto tours_io = new file_io<tour_t>(std::filesystem::absolute(tours_file_path));
+        auto tours_io = new file_io<tour_t>(tours_file_path);
         auto tours = new db_base<tour_t>(tours_io);
 
         ui_global->main(tourists, tours, employes);

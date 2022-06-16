@@ -55,7 +55,7 @@ private:
 template<class T>
 bool file_io<T>::is_empty() {
 	seek_line(0);
-	auto c = file_handle.peek();
+	file_handle.peek();
 	bool eof = file_handle.eof();
 	if (eof) file_handle.clear();
     return eof;
