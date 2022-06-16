@@ -87,13 +87,11 @@ bool min_ui::login() {
 template<>
 void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
     std::cout.setf(std::ios::left, std::ios::adjustfield);
-    std::cout.width(5); std::cout << "id";
-    std::cout.width(16); std::cout << "Surname";
-    std::cout.width(16); std::cout << "Name";
-    std::cout.width(16); std::cout << "Patronymic";
-    std::cout.width(16); std::cout << "Passport series";
-    std::cout.width(16); std::cout << "Passport number";
-    std::cout.width(22); std::cout << "Phone number" << std::endl;
+    int align[] = { 5, 16, 16, 16, 16, 16, 22 };
+    for (int i = 0; i < 7; i++) {
+        std::cout.width(align[i]); std::cout << AZ_LOC_TABLIST_TOURIST_T[i];
+    }
+    std::cout << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
@@ -113,13 +111,11 @@ void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
 template<>
 void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
     std::cout.setf(std::ios::left, std::ios::adjustfield);
-    std::cout.width(5); std::cout << "id";
-    std::cout.width(16); std::cout << "From";
-    std::cout.width(16); std::cout << "To";
-    std::cout.width(12); std::cout << "Start date";
-    std::cout.width(12); std::cout << "End date";
-    std::cout.width(32); std::cout << "Manager";
-    std::cout.width(8); std::cout << "Tourists" << std::endl;
+    int align[] = { 5, 16, 16, 12, 12, 32, 8 };
+    for (int i = 0; i < 7; i++) {
+        std::cout.width(align[i]); std::cout << AZ_LOC_TABLIST_TOUR_T[i];
+    }
+    std::cout << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         std::cout.setf(std::ios::left, std::ios::adjustfield);
@@ -134,13 +130,13 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
         std::cout.width(12); std::cout << entry->date_end;
         std::cout.width(32); std::cout << human_to_string(employes_ptr, entry->manager);
         
-        const auto width = 93 + human_to_string(employes_ptr, entry->manager).length();
+        const auto width = 93;
         const auto count = entry->tourists.size();
-        std::cout.setf(std::ios::right, std::ios::adjustfield);
+        //std::cout.setf(std::ios::right, std::ios::adjustfield);
         for (size_t i = 0; i < count; i++) {
             if (i > 0) {
                 std::cout << std::endl;
-                std::cout.width(width);
+                for (int i = 0; i < width; i++) std::cout << ' ';
             }
             std::cout << human_to_string(tourists_ptr, entry->tourists[i]);
         }
@@ -151,12 +147,11 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
 template<>
 void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
     std::cout.setf(std::ios::left, std::ios::adjustfield);
-    std::cout.width(5); std::cout << "id";
-    std::cout.width(16); std::cout << "Surname";
-    std::cout.width(16); std::cout << "Name";
-    std::cout.width(16); std::cout << "Patronymic";
-    std::cout.width(20); std::cout << "Phone number";
-    std::cout.width(8); std::cout << "Role" << std::endl;
+    int align[] = { 5, 16, 16, 16, 20, 8 };
+    for (int i = 0; i < 6; i++) {
+        std::cout.width(align[i]); std::cout << AZ_LOC_TABLIST_EMPLOYE_T[i];
+    }
+    std::cout << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
