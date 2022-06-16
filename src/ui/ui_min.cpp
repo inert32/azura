@@ -333,26 +333,15 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     }
     else {
         switch (buf[0]) {
-        case '0':
         case '1':
-        case '2':
-            tmp.role = (roles_enum)std::stoi(buf);
-            break;
-        case 'G':
-        case 'g':
-            tmp.role = roles_enum::guide;
-            break;
         case 'M':
         case 'm':
-            tmp.role = roles_enum::manager;
-            break;
+            tmp.role = roles_enum::manager; break;
+        case '2':
         case 'C':
         case 'c':
-            tmp.role = roles_enum::chief;
-            break;
-        default:
-            tmp.role = roles_enum::guide;
-            break;
+            tmp.role = roles_enum::chief; break;
+        default: break; // Default value - guide
         }
     }
 
