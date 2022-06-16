@@ -5,8 +5,8 @@
 #ifdef AZ_USE_MIN_UI
 
 void _clean_input_buffer() {
-	std::cin.seekg(0, std::ios::end);
 	std::cin.clear();
+    std::cin.sync();
 }
 
 min_ui::min_ui() {
@@ -86,53 +86,63 @@ bool min_ui::login() {
 
 template<>
 void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
-    std::cout << "id" << '\t'
-              << "Surname" << '\t'
-              << "Name" << '\t'
-              << "Patronymic" << '\t'
-              << "Passport series" << '\t'
-              << "Passport number" << '\t'
-              << "Phone number" << std::endl;
+    std::cout.setf(std::ios::left, std::ios::adjustfield);
+    std::cout.width(5); std::cout << "id";
+    std::cout.width(16); std::cout << "Surname";
+    std::cout.width(16); std::cout << "Name";
+    std::cout.width(16); std::cout << "Patronymic";
+    std::cout.width(16); std::cout << "Passport series";
+    std::cout.width(16); std::cout << "Passport number";
+    std::cout.width(22); std::cout << "Phone number" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
+        std::cout.width(5);
         if (entry->metadata.corrupt) std::cout << "!";
-        std::cout << entry->metadata.id << '\t'
-                  << entry->surname << '\t'
-                  << entry->name << '\t'
-                  << entry->patronymic << '\t'
-                  << entry->passport_series << "\t\t"
-                  << entry->passport_number << "\t\t"
-                  << phone_to_str(entry->phone_number) << std::endl;
+        std::cout << entry->metadata.id;
+        std::cout.width(16); std::cout << entry->surname;
+        std::cout.width(16); std::cout << entry->name;
+        std::cout.width(16); std::cout << entry->patronymic;
+        std::cout.width(16); std::cout << entry->passport_series;
+        std::cout.width(16); std::cout << entry->passport_number;
+        std::cout.width(22); std::cout << phone_to_str(entry->phone_number) << std::endl;
     }
 }
 
 template<>
 void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
-    std::cout << "id" << '\t'
-              << "From" << '\t'
-              << "To" << '\t'
-              << "Start date" << '\t'
-              << "End date" << '\t'
-              << "Manager" << '\t'
-              << "Tourists" << std::endl;
+    std::cout.setf(std::ios::left, std::ios::adjustfield);
+    std::cout.width(5); std::cout << "id";
+    std::cout.width(16); std::cout << "From";
+    std::cout.width(16); std::cout << "To";
+    std::cout.width(12); std::cout << "Start date";
+    std::cout.width(12); std::cout << "End date";
+    std::cout.width(32); std::cout << "Manager";
+    std::cout.width(8); std::cout << "Tourists" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
+        std::cout.setf(std::ios::left, std::ios::adjustfield);
         auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
+        std::cout.width(5);
         if (entry->metadata.corrupt) std::cout << "!";
-        std::cout << entry->metadata.id << '\t'
-                  << entry->town_from << '\t'
-                  << entry->town_to << '\t'
-                  << entry->date_start << '\t'
-                  << entry->date_end << '\t'
-                  << human_to_string(employes_ptr, entry->manager);
+        std::cout << entry->metadata.id;
+        std::cout.width(16); std::cout << entry->town_from;
+        std::cout.width(16); std::cout << entry->town_to;
+        std::cout.width(12); std::cout << entry->date_start;
+        std::cout.width(12); std::cout << entry->date_end;
+        std::cout.width(32); std::cout << human_to_string(employes_ptr, entry->manager);
         
+        const auto width = 93 + human_to_string(employes_ptr, entry->manager).length();
         const auto count = entry->tourists.size();
+        std::cout.setf(std::ios::right, std::ios::adjustfield);
         for (size_t i = 0; i < count; i++) {
+            if (i > 0) {
+                std::cout << std::endl;
+                std::cout.width(width);
+            }
             std::cout << human_to_string(tourists_ptr, entry->tourists[i]);
-            std::cout << "\n\t\t\t\t\t\t\t\t\t\t";
         }
         std::cout << std::endl;
     }
@@ -140,23 +150,25 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
 
 template<>
 void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
-    std::cout << "id" << '\t'
-              << "Surname" << '\t'
-              << "Name" << '\t'
-              << "Patronymic" << '\t'
-              << "Phone number" << '\t'
-              << "Role" << std::endl;
+    std::cout.setf(std::ios::left, std::ios::adjustfield);
+    std::cout.width(5); std::cout << "id";
+    std::cout.width(16); std::cout << "Surname";
+    std::cout.width(16); std::cout << "Name";
+    std::cout.width(16); std::cout << "Patronymic";
+    std::cout.width(20); std::cout << "Phone number";
+    std::cout.width(8); std::cout << "Role" << std::endl;
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
         if (!(entry->metadata.allow && entry->metadata.show)) continue;
+        std::cout.width(5);
         if (entry->metadata.corrupt) std::cout << "!";
-        std::cout << entry->metadata.id << '\t'
-                  << entry->surname << '\t'
-                  << entry->name << '\t'
-                  << entry->patronymic << '\t'
-                  << phone_to_str(entry->phone_number) << '\t'
-                  << role_pretty(entry->role) << std::endl;
+        std::cout << entry->metadata.id;
+        std::cout.width(16); std::cout << entry->surname;
+        std::cout.width(16); std::cout << entry->name;
+        std::cout.width(16); std::cout << entry->patronymic;
+        std::cout.width(20); std::cout << phone_to_str(entry->phone_number);
+        std::cout.width(8); std::cout << role_pretty(entry->role) << std::endl;
     }
 }
 
@@ -320,6 +332,7 @@ employe_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
     }
     else tmp.phone_number = str_to_phone(buf);
 
+    std::cout << "Roles: 0 - (G)uide, 1 - (M)anager, 2 - (C)hief" << std::endl;
     std::cout << "Role: ";
     std::getline(std::cin, buf);
     if (restore_old_value) {
