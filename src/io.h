@@ -76,19 +76,14 @@ template<class T>
 file_io<T>::file_io(const std::filesystem::path& path) {
     _file_path = path;
 
-    int tries = 0; // Trying three times to open file
-    while (tries < 3) {
-        file_handle.open(path, std::ios::in | std::ios::out | std::ios::binary);
-        if (!file_handle.good()) {
-            // Recreating file
-            file_handle.close();
-            std::filesystem::remove(path);
-            file_handle.open(path.c_str(), std::ios::in | std::ios::out | std::ios::binary);
-        }
-        else break;
-        tries++;
+    if (!std::filesystem::is_regular_file(path)) {
+        std::filesystem::remove(path);
+        file_handle.open(path, std::ios::out);
+        file_handle.close();
     }
-    if (tries == 3) throw std::runtime_error("File " + path.generic_string() + " unavaliable");
+    file_handle.open(path, std::ios::in | std::ios::out | std::ios:: binary);
+    
+    if (!file_handle.good()) throw std::runtime_error("File " + path.generic_string() + " unavaliable");
 }
 
 template<class T>

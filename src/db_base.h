@@ -19,12 +19,13 @@ public:
     bool db_sync();
     
     db_id_t db_size();
-protected:
+private:
     std::vector<T> arr;
     io_base<T>* io;
+    std::vector<db_id_t> changed_records;
 
     bool have_changed = false;
-    bool have_removed = true;
+    bool have_removed = false;
 };
 
 template<class T>
@@ -53,11 +54,14 @@ db_id_t db_base<T>::db_size() {
 
 template<class T>
 bool db_base<T>::db_sync() {
-    if (!have_changed && !have_removed) return true;
-    for (auto &x : arr) {
-		io->write_record(&x, x.metadata.id);
+    bool ret = true;
+    if (have_removed) {
+        io->have_removed();
+        for (auto &r : arr) ret = io->write_record(&r, r.metadata.id);
 	}
-    return true;
+    else if (have_changed)
+        for (auto &r : changed_records) ret = io->write_record(&arr[r], r);
+    return ret;
 }
 
 template<class T>
@@ -86,12 +90,12 @@ bool db_base<T>::record_create(T* rec) {
     have_changed = true;
     rec->metadata.id = arr.size();
     arr.push_back(*rec);
+    changed_records.push_back(rec->metadata.id);
     return true;
 }
 
 template<class T>
 bool db_base<T>::record_delete(db_id_t id) {
-    have_changed = true;
     have_removed = true;
     arr.erase(arr.begin() + id);
     const size_t new_size = arr.size();
@@ -104,6 +108,7 @@ template<class T>
 bool db_base<T>::record_update(const T* rec, const db_id_t id) {
     have_changed = true;
     arr[id] = *rec;
+    changed_records.push_back(id);
     return true;
 }
 
