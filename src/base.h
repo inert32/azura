@@ -44,6 +44,11 @@ struct _metad {
     bool show = true;
 };
 
+struct unparsed_t {
+    _metad metadata;
+    std::string fields[7];
+};
+
 struct tourist_t {
     _metad metadata;
     std::string surname;

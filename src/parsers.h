@@ -14,13 +14,33 @@
 	#define to_lower(c)  std::tolower((unsigned char)(c))
 #endif
 
+std::string phone_to_str(const unsigned long long int number); 
+unsigned long long int str_to_phone(const std::string& buf);
 
 template<class T>
 class parsers {
 public:
-    bool parse(const std::string& str, T* t);
+    unparsed_t parse(const std::string& str);
+    bool validate(const unparsed_t* from, T* to);
     void parse_tourists_count(const std::string &str, std::vector<db_id_t>* list);
 };
+
+template<class T>
+unparsed_t parsers<T>::parse(const std::string& str) {
+    unparsed_t raw;
+    std::string buf;
+    size_t left = 0, right = str.find(','), field = 0;
+
+    for (int i = 0; i < 7; i++) {
+        buf = str.substr(left, right - left);
+        raw.fields[i] = purify_buf(buf);
+
+        left = right + 1;
+        right = str.find(',', right + 1);
+        if (right == -1) right = str.length();
+    }
+    return raw;
+}
 
 template<class T>
 class prettify_records {
@@ -28,9 +48,6 @@ public:
     void prettyify(T* record);
     std::string capitalize(const std::string& str);
 };
-
-std::string phone_to_str(const unsigned long long int number); 
-unsigned long long int str_to_phone(const std::string& buf);
 
 template<class T>
 std::string prettify_records<T>::capitalize(const std::string& str) {

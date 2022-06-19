@@ -113,7 +113,8 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
         return io_codes::eof;
     }
     parsers<T> parser;
-    return (parser.parse(buf_str, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
+    auto raw = parser.parse(buf_str);
+    return (parser.validate(&raw, rec) == true) ? io_codes::struct_complete : io_codes::struct_corrupt;
 }
 
 template<class T>

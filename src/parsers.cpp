@@ -1,145 +1,168 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 #include "parsers.h"
-#include "config.h"
 
 template<>
-bool parsers<tourist_t>::parse(const std::string &str, tourist_t* t) {
-    std::string buf;
-    size_t left = 0, right = str.find(','), field = 0;
+bool parsers<tourist_t>::validate(const unparsed_t* from, tourist_t* to) {
+    db_id_t dummy_id = -1; // records id pool if we can`t read true id
     bool is_good = true;
-    try {
-        while (field < 7) {
-            buf = str.substr(left, right - left);
-            buf = purify_buf(buf);
-            if (buf.empty()) is_good = false;
-            switch (field) {
-            case 0:
-                t->metadata.id = std::stoull(buf);
-                break;
-            case 1:
-                t->surname = buf;
-                break;
-            case 2:
-                t->name = buf;
-                break;
-            case 3:
-                t->patronymic = buf;
-                break;
-            case 4:
-                t->passport_series = std::stoi(buf);
-                break;
-            case 5:
-                t->passport_number = std::stoi(buf);
-                break;
-            case 6:
-                t->phone_number = std::stoull(buf);
-                break;
-            default:
-                break;
-            }
-            field++;
-            left = right + 1;
-            right = str.find(',', right + 1);
-            if (right == -1) right = str.length();
+    for (int i = 0; i < 7; i++) {
+        if (from->fields[i].empty()) {
+            is_good = false;
+            continue;
         }
-    }
-    catch (std::exception &e) { return false; }
-    return is_good;
-}
-
-template<>
-bool parsers<tour_t>::parse(const std::string &str, tour_t* t) {
-    std::string buf;
-    size_t left = 0, right = str.find(','), field = 0;
-    bool is_good = true;
-    try {
-        while (field < 7) {
-            buf = str.substr(left, right - left);
-            buf = purify_buf(buf);
-            if (buf.empty()) is_good = false;
-            switch (field) {
-            case 0:
-                t->metadata.id = std::stoull(buf);
-                break;
-            case 1:
-                t->town_from = buf;
-                break;
-            case 2:
-                t->town_to = buf;
-                break;
-            case 3: {
-                t->date_start.set(buf);
-                if (!(t->date_start.validate())) is_good = false;
-                break;
+        switch (i) {
+        case 0:
+            try {
+                to->metadata.id = std::stoull(from->fields[i]);
             }
-            case 4: {
-                t->date_end.set(buf);
-                if (!(t->date_end.validate())) is_good = false;
-                break;
+            catch (std::exception& e) {
+                is_good = false;
+                to->metadata.id = dummy_id;
+                dummy_id--;
             }
-            case 5:
-                t->manager = std::stoll(buf);
-                break;
-            case 6: {
-                size_t count = 0;
-                parse_tourists_count(buf, &t->tourists);
-                break;
+            break;
+        case 1:
+            to->surname = from->fields[i]; break;
+        case 2:
+            to->name = from->fields[i]; break;
+        case 3:
+            to->patronymic = from->fields[i]; break;
+        case 4:
+            try {
+                to->passport_series = std::stoi(from->fields[i]);
+                if (to->passport_series < 1000 || to->passport_series > 9999) is_good = false;
             }
-            default:
+            catch (std::exception& e) {
+                is_good = false;
+            }
+            break;
+        case 5:
+            try {
+                to->passport_number = std::stoi(from->fields[i]);
+                if (to->passport_series < 100000 || to->passport_series > 999999) is_good = false;
+            }
+            catch (std::exception& e) {
+                is_good = false;
+            }
+            break;
+        case 6:
+            try {
+                to->phone_number = std::stoull(from->fields[i]);
+                if (to->phone_number < 10000000000) is_good = false;
+            }
+            catch (std::exception& e) {
+                is_good = false;
+            }
             break;
         }
-        field++;
-        left = right + 1;
-        right = str.find(',', right + 1);
-        if (right == -1) right = str.length();
-        }
     }
-    catch (std::exception &e) { return false; }
     return is_good;
 }
 
 template<>
-bool parsers<employe_t>::parse(const std::string &str, employe_t* t) {
-    std::string buf;
-    size_t left = 0, right = str.find(','), field = 0;
+bool parsers<tour_t>::validate(const unparsed_t* from, tour_t* to) {
+    db_id_t dummy_id = -1; // records id pool if we can`t read true id
     bool is_good = true;
-    try {
-        while (field < 7) {
-            buf = str.substr(left, right - left);
-            buf = purify_buf(buf);
-            if (buf.empty()) is_good = false;
-            switch (field) {
-            case 0:
-                t->metadata.id = std::stoull(buf);
-                break;
-            case 1:
-                t->surname = buf;
-                break;
-            case 2:
-                t->name = buf;
-                break;
-            case 3:
-                t->patronymic = buf;
-                break;
-            case 4:
-                t->phone_number = std::stoull(buf);
-                break;
-            case 5:
-                t->role = (roles_enum)std::stoi(buf);
-                break;
-            case 6:
-                t->passwd = buf;
-                break;
-            default: break;
+    for (int i = 0; i < 7; i++) {
+        if (from->fields[i].empty()) {
+            is_good = false;
+            continue;
+        }
+        switch (i) {
+        case 0:
+            try {
+                to->metadata.id = std::stoull(from->fields[i]);
             }
-            field++;
-            left = right + 1;
-            right = str.find(',', right + 1);
-            if (right == str.npos) right = str.length();
+            catch (std::exception& e) {
+                is_good = false;
+                to->metadata.id = dummy_id;
+                dummy_id--;
+            }
+            break;
+        case 1:
+            to->town_from = from->fields[i]; break;
+        case 2:
+            to->town_to = from->fields[i]; break;
+        case 3:
+            to->date_start.set(from->fields[i]);
+            if (to->date_start.validate() == false) is_good = false;
+            break;
+        case 4:
+            to->date_end.set(from->fields[i]);
+            if (to->date_end.validate() == false || 
+            to->date_start > to->date_end) is_good = false;
+
+            break;
+        case 5:
+            try {
+                to->manager = std::stoull(from->fields[i]);
+            }
+            catch (std::exception& e) {
+                is_good = false;
+            }
+            break;
+        case 6:
+            parse_tourists_count(from->fields[i], &to->tourists); break;
         }
     }
-    catch (std::exception &e) { return false; }
+    return is_good;
+}
+
+template<>
+bool parsers<employe_t>::validate(const unparsed_t* from, employe_t* to) {
+    db_id_t dummy_id = -1; // records id pool if we can`t read true id
+    bool is_good = true;
+    for (int i = 0; i < 7; i++) {
+        if (from->fields[i].empty()) {
+            is_good = false;
+            continue;
+        }
+        switch (i) {
+        case 0:
+            try {
+                to->metadata.id = std::stoull(from->fields[i]);
+            }
+            catch (std::exception& e) {
+                is_good = false;
+                to->metadata.id = dummy_id;
+                dummy_id--;
+            }
+            break;
+        case 1:
+            to->surname = from->fields[i]; break;
+        case 2:
+            to->name = from->fields[i]; break;
+        case 3:
+            to->patronymic = from->fields[i]; break;
+        case 4:
+            try {
+                to->phone_number = std::stoull(from->fields[i]);
+                if (to->phone_number < 10000000000) is_good = false;
+            }
+            catch (std::exception& e) {
+                is_good = false;
+            }
+            break;
+        case 5:
+            auto role_raw = std::stoi(from->fields[i]);
+            switch (role_raw) {
+            case 0:
+            default:
+                to->role = roles_enum::guide;
+                break;
+            case 1:
+                to->role = roles_enum::manager;
+                break;
+            case 2:
+                to->role = roles_enum::chief;
+                break;
+            }
+        case 6:
+            to->passwd = from->fields[i];
+            break;
+        }
+    }
     return is_good;
 }
 

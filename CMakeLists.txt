@@ -9,7 +9,7 @@ project(azura_proj)
 
 add_compile_definitions(AZ_VER_MAJOR=0)
 add_compile_definitions(AZ_VER_MINOR=6)
-add_compile_definitions(AZ_VER_PATCH=2)
+add_compile_definitions(AZ_VER_PATCH=3)
 
 add_executable(azura
 src/main.cpp src/base.cpp src/secure.cpp
