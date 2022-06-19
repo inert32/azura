@@ -36,7 +36,7 @@ class min_ui_main {
 public:
     void set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes);
     tables_list main(db_base<T>* table, const tables_list current);
-    T create_record(T* old_data = nullptr);
+    unparsed_t create_record(T* old_data = nullptr);
 
 private:
     void record_create(db_base<T>* table);
@@ -141,6 +141,23 @@ void min_ui_main<T>::record_update(db_base<T>* table) {
         table->record_update(&rec, id);
     }
     else std::cout << "No such record." << std::endl;
+}
+
+template<class T>
+unparsed_t min_ui_main<T>::create_record(T* old_data) {
+    unparsed_t raw;
+    parsers<T> parser;
+    tablist<T> tabs;
+    if (old_data != nullptr) raw = parser.record_to_raw(old_data);
+
+    for (int i = 1; i < 7; i++) {
+        std::string buf;
+        std::cout << tabs.get(i) << ": ";
+        std::getline(std::cin, buf);
+        if (buf != "-") raw.fields[i] = buf;
+    }
+
+    return raw;
 }
 
 template<class T>

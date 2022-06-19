@@ -9,14 +9,6 @@ unsigned int tty_width;
 unsigned int tty_heigth_subwin;
 unsigned int tty_width_subwin;
 
-// Utility macros to create form
-#define prep_form(form) \
-    int y = 0, x = 0; \
-    scale_form((form), &y, &x); \
-    set_form_win((form), raw); \
-    set_form_sub((form), derwin(raw, y, x, 2, 20)); \
-    post_form((form)); \
-
 int mvwprintw(WINDOW *win, int y, int x, const std::string& fmt) {
     return mvwprintw(win, y, x, fmt.c_str());
 }
@@ -256,74 +248,6 @@ void curses_ui_main<tourist_t>::_mk_tables_headers() {
 }
 
 template<>
-bool curses_ui_main<tourist_t>::create_record(tourist_t* new_data, tourist_t* old_data) {
-    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
-    auto window = new curses_subwin(title);
-    auto raw = window->get_raw();
-    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOURIST_T[0]);
-    FIELD* fields[7];
-    for (int i = 0; i < 6; i++) {
-        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOURIST_T[i + 1]);
-        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
-        set_field_back(fields[i], A_UNDERLINE);
-        if (old_data != nullptr) {
-            switch (i) {
-            case 0:
-                set_field_buffer(fields[i], 0, old_data->surname.c_str()); break;
-            case 1:
-                set_field_buffer(fields[i], 0, old_data->name.c_str()); break;
-            case 2:
-                set_field_buffer(fields[i], 0, old_data->patronymic.c_str()); break;
-            case 3:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_series).c_str()); break;
-            case 4:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->passport_number).c_str()); break;
-            case 5:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str()); break;
-            }
-        }
-    }
-    fields[6] = nullptr;
-    FORM* form = new_form(fields);
-    prep_form(form);
-    if (old_data != nullptr)
-        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
-    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
-
-    bool send_away = _form_control(form, raw);
-    if (send_away) { // Save data
-        for (int i = 0; i < 6; i++) {
-            try {
-                std::string buf(field_buffer(fields[i], 0));
-                switch (i) {
-                case 0:
-                    new_data->surname = buf; break;
-                case 1:
-                    new_data->name = buf; break;
-                case 2: 
-                    new_data->patronymic = buf; break;
-                case 3:
-                    new_data->passport_series = std::stoul(buf); break;
-                case 4:
-                    new_data->passport_number = std::stoul(buf); break;
-                case 5:
-                    new_data->phone_number = std::stoull(buf); break;
-                }
-            }
-            catch (const std::exception& e) {
-                new_data->metadata.corrupt = true;
-            }
-        }
-    }
-    // cleanup
-    unpost_form(form);
-    free_form(form);
-    for (int i = 0; i < 7; i++) free_field(fields[i]);
-    delete window;
-    return send_away;
-}
-
-template<>
 unsigned int *curses_ui_main<tour_t>::_calc_table_width() {
     unsigned int* val = new unsigned int[7];
     val[0] = 3;
@@ -371,84 +295,6 @@ void curses_ui_main<tour_t>::_mk_tables_headers() {
         wattroff(ui_head[i], COLOR_PAIR(tty_colors_title));
     }
 }
-
-template<>
-bool curses_ui_main<tour_t>::create_record(tour_t* new_data, tour_t* old_data) {
-    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
-    auto window = new curses_subwin(title);
-    auto raw = window->get_raw();
-    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_TOUR_T[0]);
-    FIELD* fields[7];
-    for (int i = 0; i < 6; i++) {
-        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_TOUR_T[i + 1]);
-        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
-        set_field_back(fields[i], A_UNDERLINE);
-        if (old_data != nullptr) {
-            switch (i) {
-            case 0:
-                set_field_buffer(fields[i], 0, old_data->town_from.c_str()); break;
-            case 1:
-                set_field_buffer(fields[i], 0, old_data->town_to.c_str()); break;
-            case 2:
-                set_field_buffer(fields[i], 0, old_data->date_start.to_string().c_str()); break;
-            case 3:
-                set_field_buffer(fields[i], 0, old_data->date_end.to_string().c_str()); break;
-            case 4:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->manager).c_str()); break;
-            case 5: {
-                std::string str;
-                for (auto &x : old_data->tourists) str += std::to_string(x) + ";";
-                str.erase(str.end() - 1);
-                set_field_buffer(fields[i], 0, str.c_str());
-                break;
-            }
-            }
-        }
-    }
-    fields[6] = nullptr;
-    FORM* form = new_form(fields);
-    prep_form(form);
-    if (old_data != nullptr)
-        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
-    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
-
-    bool send_away = _form_control(form, raw);
-    if (send_away) { // Save data
-        for (int i = 0; i < 6; i++) {
-            try {
-                std::string buf(field_buffer(fields[i], 0));
-                switch (i) {
-                case 0:
-                    new_data->town_from = buf; break;
-                case 1:
-                    new_data->town_to = buf; break;
-                case 2: 
-                    new_data->date_start.set(buf); break;
-                case 3:
-                    new_data->date_end.set(buf); break;
-                case 4:
-                    new_data->manager = std::stoull(buf); break;
-                case 5: {
-                    for (auto &c : buf) if (c == ',' || c == ' ') c = ';';
-                    parsers<tour_t> parser; 
-                    parser.parse_tourists_count(buf, &new_data->tourists);
-                    break;
-                }
-                }
-            }
-            catch (const std::exception& e) {
-                new_data->metadata.corrupt = true;
-            }
-        }
-    }
-    // cleanup
-    unpost_form(form);
-    free_form(form);
-    for (int i = 0; i < 7; i++) free_field(fields[i]);
-    delete window;
-    return send_away;
-}
-
 template<>
 unsigned int *curses_ui_main<employe_t>::_calc_table_width() {
     unsigned int* val = new unsigned int[7];
@@ -492,45 +338,30 @@ void curses_ui_main<employe_t>::_mk_tables_headers() {
 }
 
 template<>
-bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* old_data) {
+bool curses_ui_main<employe_t>::create_record(unparsed_t* new_data, employe_t* old_data) {
     std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
     auto window = new curses_subwin(title);
     auto raw = window->get_raw();
-    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[0]);
+
+    parsers<employe_t> parser;
+    if (old_data != nullptr) *new_data = parser.record_to_raw(old_data);
+
+    tablist<employe_t> tabs;
+    mvwprintw(raw, 2, 2, tabs.get(0));
     FIELD* fields[6];
-    roles_enum role = roles_enum::guide;
     for (int i = 0; i < 5; i++) {
-        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[i + 1]);
+        mvwprintw(raw, 2 + (i+1) * 2, 2, tabs.get(i + 1));
         fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
         set_field_back(fields[i], A_UNDERLINE);
-        if (old_data != nullptr) {
-            switch (i) {
-            case 0:
-                set_field_buffer(fields[i], 0, old_data->surname.c_str());
-                break;
-            case 1:
-                set_field_buffer(fields[i], 0, old_data->name.c_str());
-                break;
-            case 2:
-                set_field_buffer(fields[i], 0, old_data->patronymic.c_str());
-                break;
-            case 3:
-                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str());
-                break;
-            case 4:
-                set_field_buffer(fields[i], 0, old_data->passwd.c_str());
-                break;
-            }
-            role = old_data->role;
-        }
+        set_field_buffer(fields[i], 0, new_data->fields[i + 1].c_str());
     }
     fields[5] = nullptr;
     FORM* form = new_form(fields);
     prep_form(form);
+    if (old_data != nullptr) mvwprintw(raw, 2, 32, new_data->fields[0]);
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
 
-    if (old_data != nullptr)
-        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
-    mvwprintw(raw, 14, 2, AZ_LOC_TABLIST_EMPLOYE_T[6]);
+    roles_enum role = roles_enum::guide;
 
     bool run = true;
     bool send_away = false;
@@ -580,6 +411,60 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
         }
         form_driver(form, REQ_VALIDATION);
     }
+    
+    if (send_away) // Save data
+        for (int i = 0; i < 6; i++)
+            new_data->fields[i + 1] = field_buffer(fields[i], 0);
+    new_data->fields[5] = std::to_string((int)role);
+    // cleanup
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 6; i++) free_field(fields[i]);
+    delete window;
+    return send_away;
+}
+/*
+bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* old_data) {
+    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
+    auto window = new curses_subwin(title);
+    auto raw = window->get_raw();
+    mvwprintw(raw, 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[0]);
+    FIELD* fields[6];
+    roles_enum role = roles_enum::guide;
+    for (int i = 0; i < 5; i++) {
+        mvwprintw(raw, 2 + (i+1) * 2, 2, AZ_LOC_TABLIST_EMPLOYE_T[i + 1]);
+        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        set_field_back(fields[i], A_UNDERLINE);
+        if (old_data != nullptr) {
+            switch (i) {
+            case 0:
+                set_field_buffer(fields[i], 0, old_data->surname.c_str());
+                break;
+            case 1:
+                set_field_buffer(fields[i], 0, old_data->name.c_str());
+                break;
+            case 2:
+                set_field_buffer(fields[i], 0, old_data->patronymic.c_str());
+                break;
+            case 3:
+                set_field_buffer(fields[i], 0, std::to_string(old_data->phone_number).c_str());
+                break;
+            case 4:
+                set_field_buffer(fields[i], 0, old_data->passwd.c_str());
+                break;
+            }
+            role = old_data->role;
+        }
+    }
+    fields[5] = nullptr;
+    FORM* form = new_form(fields);
+    prep_form(form);
+
+    if (old_data != nullptr)
+        mvwprintw(raw, 2, 32, std::to_string(old_data->metadata.id));
+    mvwprintw(raw, 14, 2, AZ_LOC_TABLIST_EMPLOYE_T[6]);
+
+    
 
     if (send_away) { // Save data
         for (int i = 0; i < 5; i++) {
@@ -610,7 +495,7 @@ bool curses_ui_main<employe_t>::create_record(employe_t* new_data, employe_t* ol
     for (int i = 0; i < 5; i++) free_field(fields[i]);
     delete window;
     return send_away;
-}
+}*/
 
 bool _form_control(FORM* form, WINDOW* wnd) {
     bool run = true;
@@ -643,14 +528,18 @@ bool _form_control(FORM* form, WINDOW* wnd) {
 
 bool curses_ui::adduser(io_base<employe_t>* employes) {
     auto ui = new curses_ui_main<employe_t>;
-    employe_t reg;
+    unparsed_t reg;
     bool out = ui->create_record(&reg, nullptr);
     delete ui;
     if (out == false) return false;
-    reg.role = roles_enum::chief;
+
+    parsers<employe_t> parser;
+    employe_t user;
+    parser.validate(&reg, &user, false);
     prettify_records<employe_t> p;
-    p.prettyify(&reg);
-    return secure->useradd(&reg);
+    p.prettyify(&user);
+    user.role = roles_enum::chief;
+    return secure->useradd(&user);
 }
 
 #endif /* AZ_USE_CURSES_UI */

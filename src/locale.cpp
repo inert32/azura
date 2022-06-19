@@ -47,7 +47,25 @@ const std::string AZ_LOC_TABLIST_TOUR_T[] =
 const std::string AZ_LOC_TABLIST_EMPLOYE_T[] = 
 { AZ_LOC_TAB_ID, AZ_LOC_TAB_SURNAME, AZ_LOC_TAB_NAME, 
   AZ_LOC_TAB_PATRONYMIC, AZ_LOC_TAB_PHONE_NUMBER, 
-  AZ_LOC_TAB_PASSWD, AZ_LOC_TAB_ROLE };
+  AZ_LOC_TAB_ROLE, AZ_LOC_TAB_PASSWD };
 
 const std::string AZ_LOC_ERR_EXCEPTION = "Exception occured";
 const std::string AZ_LOC_ERR_NOFILE = "File unavaliable";
+
+template<>
+std::string tablist<tourist_t>::get(const short int line) {
+    if (line < 7) return AZ_LOC_TABLIST_TOURIST_T[line];
+    else return "";
+}
+
+template<>
+std::string tablist<tour_t>::get(const short int line) {
+    if (line < 7) return AZ_LOC_TABLIST_TOUR_T[line];
+    else return "";
+}
+
+template<>
+std::string tablist<employe_t>::get(const short int line) {
+    if (line < 7) return AZ_LOC_TABLIST_EMPLOYE_T[line];
+    else return "";
+}

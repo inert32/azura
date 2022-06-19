@@ -3,10 +3,12 @@
 #include "parsers.h"
 
 template<>
-bool parsers<tourist_t>::validate(const unparsed_t* from, tourist_t* to) {
+bool parsers<tourist_t>::validate(const unparsed_t* from, tourist_t* to, bool check_id) {
     db_id_t dummy_id = -1; // records id pool if we can`t read true id
     bool is_good = true;
-    for (int i = 0; i < 7; i++) {
+    int i = 0;
+    if (check_id == false) i++;
+    for (; i < 7; i++) {
         if (from->fields[i].empty()) {
             is_good = false;
             continue;
@@ -40,7 +42,7 @@ bool parsers<tourist_t>::validate(const unparsed_t* from, tourist_t* to) {
         case 5:
             try {
                 to->passport_number = std::stoi(from->fields[i]);
-                if (to->passport_series < 100000 || to->passport_series > 999999) is_good = false;
+                if (to->passport_number < 100000 || to->passport_number > 999999) is_good = false;
             }
             catch (std::exception& e) {
                 is_good = false;
@@ -61,10 +63,25 @@ bool parsers<tourist_t>::validate(const unparsed_t* from, tourist_t* to) {
 }
 
 template<>
-bool parsers<tour_t>::validate(const unparsed_t* from, tour_t* to) {
+unparsed_t parsers<tourist_t>::record_to_raw(tourist_t* from) {
+    unparsed_t raw;
+    raw.fields[0] = std::to_string(from->metadata.id);
+    raw.fields[1] = from->surname;
+    raw.fields[2] = from->name;
+    raw.fields[3] = from->patronymic;
+    raw.fields[4] = std::to_string(from->passport_series);
+    raw.fields[5] = std::to_string(from->passport_number);
+    raw.fields[6] = std::to_string(from->phone_number);
+    return raw;
+}
+
+template<>
+bool parsers<tour_t>::validate(const unparsed_t* from, tour_t* to, bool check_id) {
     db_id_t dummy_id = -1; // records id pool if we can`t read true id
     bool is_good = true;
-    for (int i = 0; i < 7; i++) {
+    int i = 0;
+    if (check_id == false) i++;
+    for (; i < 7; i++) {
         if (from->fields[i].empty()) {
             is_good = false;
             continue;
@@ -110,10 +127,29 @@ bool parsers<tour_t>::validate(const unparsed_t* from, tour_t* to) {
 }
 
 template<>
-bool parsers<employe_t>::validate(const unparsed_t* from, employe_t* to) {
+unparsed_t parsers<tour_t>::record_to_raw(tour_t* from) {
+    unparsed_t raw;
+    raw.fields[0] = std::to_string(from->metadata.id);
+    raw.fields[1] = from->town_from;
+    raw.fields[2] = from->town_to;
+    raw.fields[3] = from->date_start.to_string();
+    raw.fields[4] = from->date_end.to_string();
+    raw.fields[5] = std::to_string(from->manager);
+    const auto count = from->tourists.size();
+	for (size_t i = 0; i < count; i++) {
+		raw.fields[6] += std::to_string(from->tourists[i]);
+		if (i + 1 < count) raw.fields[6] += ';';
+	}
+    return raw;
+}
+
+template<>
+bool parsers<employe_t>::validate(const unparsed_t* from, employe_t* to, bool check_id) {
     db_id_t dummy_id = -1; // records id pool if we can`t read true id
     bool is_good = true;
-    for (int i = 0; i < 7; i++) {
+    int i = 0;
+    if (check_id == false) i++;
+    for (; i < 7; i++) {
         if (from->fields[i].empty()) {
             is_good = false;
             continue;
@@ -145,25 +181,44 @@ bool parsers<employe_t>::validate(const unparsed_t* from, employe_t* to) {
             }
             break;
         case 5:
-            auto role_raw = std::stoi(from->fields[i]);
-            switch (role_raw) {
-            case 0:
-            default:
-                to->role = roles_enum::guide;
-                break;
-            case 1:
-                to->role = roles_enum::manager;
-                break;
-            case 2:
-                to->role = roles_enum::chief;
-                break;
+            try {
+                auto role_raw = std::stoi(from->fields[i]);
+                switch (role_raw) {
+                case 0:
+                default:
+                    to->role = roles_enum::guide;
+                    break;
+                case 1:
+                    to->role = roles_enum::manager;
+                    break;
+                case 2:
+                    to->role = roles_enum::chief;
+                    break;
+                }
             }
+            catch (std::exception& e) {
+                to->role = roles_enum::guide;
+            }
+            break;
         case 6:
             to->passwd = from->fields[i];
             break;
         }
     }
     return is_good;
+}
+
+template<>
+unparsed_t parsers<employe_t>::record_to_raw(employe_t* from) {
+    unparsed_t raw;
+    raw.fields[0] = std::to_string(from->metadata.id);
+    raw.fields[1] = from->surname;
+    raw.fields[2] = from->name;
+    raw.fields[3] = from->patronymic;
+    raw.fields[4] = std::to_string(from->phone_number);
+    raw.fields[5] = std::to_string((int)from->role);
+    raw.fields[6] = from->passwd;
+    return raw;
 }
 
 template<>

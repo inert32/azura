@@ -5,6 +5,14 @@
 
 #ifdef AZ_USE_CURSES_UI
 
+// Utility macros to create form
+#define prep_form(form) \
+    int y = 0, x = 0; \
+    scale_form((form), &y, &x); \
+    set_form_win((form), raw); \
+    set_form_sub((form), derwin(raw, y, x, 2, 20)); \
+    post_form((form)); \
+
 extern unsigned int tty_heigth;
 extern unsigned int tty_width;
 extern unsigned int tty_heigth_subwin;
@@ -50,7 +58,7 @@ class curses_ui_main {
 public:
     void set_tables(db_base<tourist_t>* tourists, db_base<tour_t>* tours, db_base<employe_t>* employes);
     tables_list main(db_base<T>* table, const tables_list current);
-    bool create_record(T* new_data, T* old_data = nullptr);
+    bool create_record(unparsed_t* new_data, T* old_data = nullptr);
 
 private:
     void record_create(db_base<T>* table);
@@ -99,6 +107,42 @@ void curses_ui_main<T>::set_tables(db_base<tourist_t>* tourists, db_base<tour_t>
     tourists_ptr = tourists;
     tours_ptr = tours;
     employes_ptr = employes;
+}
+
+template<class T>
+bool curses_ui_main<T>::create_record(unparsed_t* new_data, T* old_data) {
+    std::string title = (old_data == nullptr) ? AZ_LOC_MENU_ENTRY_ADD : AZ_LOC_MENU_ENTRY_EDIT;
+    auto window = new curses_subwin(title);
+    auto raw = window->get_raw();
+
+    parsers<T> parser;
+    if (old_data != nullptr) *new_data = parser.record_to_raw(old_data);
+
+    tablist<T> tabs;
+    mvwprintw(raw, 2, 2, tabs.get(0));
+    FIELD* fields[7];
+    for (int i = 0; i < 6; i++) {
+        mvwprintw(raw, 2 + (i+1) * 2, 2, tabs.get(i + 1));
+        fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
+        set_field_back(fields[i], A_UNDERLINE);
+        set_field_buffer(fields[i], 0, new_data->fields[i + 1].c_str());
+    }
+    fields[6] = nullptr;
+    FORM* form = new_form(fields);
+    prep_form(form);
+    if (old_data != nullptr) mvwprintw(raw, 2, 32, new_data->fields[0]);
+    mvwprintw(raw, 16, 1, "Enter: save changes | Esc: discard changes");
+
+    bool send_away = _form_control(form, raw);
+    if (send_away) // Save data
+        for (int i = 0; i < 6; i++)
+            new_data->fields[i + 1] = field_buffer(fields[i], 0);
+    // cleanup
+    unpost_form(form);
+    free_form(form);
+    for (int i = 0; i < 7; i++) free_field(fields[i]);
+    delete window;
+    return send_away;
 }
 
 template<class T>
@@ -208,22 +252,15 @@ tables_list curses_ui_main<T>::main(db_base<T>* table, const tables_list current
 
 template<class T>
 void curses_ui_main<T>::record_create(db_base<T>* table) {
-    T rec;
-    if (create_record(&rec)) {
-        prettify_records<T> p;
-        p.prettyify(&rec);
-        table->record_create(&rec);
-    }
+    unparsed_t rec;
+    if (create_record(&rec)) table->record_create(&rec);
 }
 
 template<class T>
 void curses_ui_main<T>::record_update(db_base<T>* table) {
-    T rec;
-    if (create_record(&rec, table->record_read(current_id))) {
-        prettify_records<T> p;
-        p.prettyify(&rec);
+    unparsed_t rec;
+    if (create_record(&rec, table->record_read(current_id)))
         table->record_update(&rec, current_id);
-    }
 }
 
 template<class T>

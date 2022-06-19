@@ -9,16 +9,28 @@ std::string purify_buf(const std::string& buf) {
 }
 
 const bool operator>(const date& d1, const date& d2) {
-    if (d1.year > d2.year) return false;
-    if (d1.month > d2.month) return false;
-    if (d1.day > d2.day) return false;
-    return true;
+    constexpr auto sec_in_year = 31536000;
+    constexpr auto leap_seconds = 86400;
+
+    unsigned long long int unixtime_d1 = sec_in_year;
+    if (d1.is_leap()) unixtime_d1 += leap_seconds;
+
+    unsigned long long int unixtime_d2 = sec_in_year;
+    if (d2.is_leap()) unixtime_d2 += leap_seconds;
+
+    return unixtime_d1 > unixtime_d2;
 }
 const bool operator<(const date& d1, const date& d2) {
-    if (d1.year < d2.year) return false;
-    if (d1.month < d2.month) return false;
-    if (d1.day < d2.day) return false;
-    return true;
+    constexpr auto sec_in_year = 31536000;
+    constexpr auto leap_seconds = 86400;
+
+    unsigned long long int unixtime_d1 = sec_in_year;
+    if (d1.is_leap()) unixtime_d1 += leap_seconds;
+
+    unsigned long long int unixtime_d2 = sec_in_year;
+    if (d2.is_leap()) unixtime_d2 += leap_seconds;
+
+    return unixtime_d1 < unixtime_d2;
 }
 
 std::ostream& operator<<(std::ostream& out, const date& date) {
@@ -64,20 +76,23 @@ void date::set(unsigned short new_day, unsigned short new_month, int new_year) {
 }
 
 bool date::validate() {
-    if (day > 31 || month > 12) {
-       return false;
-    }
+    if (day == 0 || month == 0) return false;
+
+    if (day > 31 || month > 12) return false;
 
     if (day == 31 &&
-       (month == 4 || month == 6 || month == 9 || month == 11)) {
-       return false;
-    }
+       (month == 4 || month == 6 || month == 9 || month == 11)) return false;
 
     if (month == 2 && day == 29 && // Если 29 февраля
-       !((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) { // и год не високосный
+       !((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) // и год не високосный
        return false;
-    }
+       
     return true;
+}
+
+bool date::is_leap() const {
+    return (month == 2 && day == 29 && // Если 29 февраля
+           ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)); // и год не високосный
 }
 
 std::string date::to_string() {

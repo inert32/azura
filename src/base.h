@@ -26,6 +26,7 @@ public:
     void set(unsigned short day, unsigned short month, int year);
     std::string to_string();
 
+    bool is_leap() const;
     bool validate();
 
     friend const bool operator>(const date& d1, const date& d2);
@@ -45,7 +46,6 @@ struct _metad {
 };
 
 struct unparsed_t {
-    _metad metadata;
     std::string fields[7];
 };
 

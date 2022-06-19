@@ -21,7 +21,9 @@ template<class T>
 class parsers {
 public:
     unparsed_t parse(const std::string& str);
-    bool validate(const unparsed_t* from, T* to);
+    unparsed_t record_to_raw(T* from);
+
+    bool validate(const unparsed_t* from, T* to, bool check_id = true);
     void parse_tourists_count(const std::string &str, std::vector<db_id_t>* list);
 };
 

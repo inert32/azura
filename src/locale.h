@@ -2,6 +2,7 @@
 #define __LOCALE_H__
 
 #include <string>
+#include "base.h"
 
 extern const std::string AZ_LOC_PROGNAME;
 
@@ -42,5 +43,11 @@ extern const std::string AZ_LOC_TABLIST_EMPLOYE_T[];
 
 extern const std::string AZ_LOC_ERR_EXCEPTION;
 extern const std::string AZ_LOC_ERR_NOFILE;
+
+template<class T>
+class tablist {
+public: 
+    std::string get(const short int line);
+};
 
 #endif /* __LOCALE_H__ */

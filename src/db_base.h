@@ -10,9 +10,9 @@ public:
     db_base(io_base<T>* _io);
     ~db_base();
 
-    bool record_create(T* rec);
+    bool record_create(unparsed_t* rec);
     T* record_read(const db_id_t id);
-    bool record_update(const T* rec, const db_id_t id);
+    bool record_update(const unparsed_t* rec, const db_id_t id);
     bool record_delete(const db_id_t id);
     bool record_exists(const db_id_t id);
 
@@ -86,11 +86,18 @@ bool db_base<T>::record_exists(const db_id_t id) {
 }
 
 template<class T>
-bool db_base<T>::record_create(T* rec) {
+bool db_base<T>::record_create(unparsed_t* rec) {
     have_changed = true;
-    rec->metadata.id = arr.size();
-    arr.push_back(*rec);
-    changed_records.push_back(rec->metadata.id);
+    T record;
+    record.metadata.id = arr.size();
+
+    parsers<T> parser;
+    if (parser.validate(rec, &record, false) == false) record.metadata.corrupt = true;
+
+    prettify_records<T> pr;
+    pr.prettyify(&record);
+    arr.push_back(record);
+    changed_records.push_back(record.metadata.id);
     return true;
 }
 
@@ -105,9 +112,18 @@ bool db_base<T>::record_delete(db_id_t id) {
 }
 
 template<class T>
-bool db_base<T>::record_update(const T* rec, const db_id_t id) {
+bool db_base<T>::record_update(const unparsed_t* rec, const db_id_t id) {
     have_changed = true;
-    arr[id] = *rec;
+    T record;
+    record.metadata.id = id;
+
+    parsers<T> parser;
+    if (parser.validate(rec, &record, false) == false) record.metadata.corrupt = true;
+
+    prettify_records<T> pr;
+    pr.prettyify(&record);
+
+    arr[id] = record;
     changed_records.push_back(id);
     return true;
 }
