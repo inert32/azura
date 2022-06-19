@@ -29,6 +29,7 @@ int main(int argc, char** argv) {
     ui_global = new current_ui();
     try {
         auto employes_io = new file_io<employe_t>(employes_file_path);
+        if (employes_io->is_read_only()) ui_global->msg("File " + employes_file_path.generic_string() + " is read-only");
         secure = new secure_ctl(employes_io);
         if (secure->need_admin() && !ui_global->adduser(employes_io)) {
             ui_global->err("Registration failed");
@@ -47,9 +48,11 @@ int main(int argc, char** argv) {
         auto employes = new db_base<employe_t>(employes_io);
 
         auto tourists_io = new file_io<tourist_t>(tourists_file_path);
+        if (tourists_io->is_read_only()) ui_global->msg("File " + tourists_file_path.generic_string() + " is read-only");
         auto tourists = new db_base<tourist_t>(tourists_io);
 
         auto tours_io = new file_io<tour_t>(tours_file_path);
+        if (tours_io->is_read_only()) ui_global->msg("File " + tours_file_path.generic_string() + " is read-only");
         auto tours = new db_base<tour_t>(tours_io);
 
         ui_global->main(tourists, tours, employes);

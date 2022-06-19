@@ -27,9 +27,10 @@ class io_base {
 public:
     virtual io_codes read_record(T* rec, const db_id_t id = -1) = 0;
     virtual bool write_record(const T* rec, const db_id_t id = -1) = 0;
-
     virtual void sync() = 0;
+
     virtual bool is_empty() = 0;
+    virtual bool is_read_only() = 0;
 
     virtual void have_removed() = 0;
 };
@@ -42,9 +43,10 @@ public:
     
     io_codes read_record(T* rec, const db_id_t id = -1);
     bool write_record(const T* rec, const db_id_t id = -1);
-    
     void sync();
+
     bool is_empty();
+    bool is_read_only();
 
     void have_removed();
 private:
@@ -54,6 +56,7 @@ private:
 
     bool seek_line(const db_id_t line);
     void _write_rec(const T* rec);
+    bool read_only = false;
 };
 
 template<class T>
@@ -63,6 +66,11 @@ bool file_io<T>::is_empty() {
 	bool eof = file_handle.eof();
 	if (eof) file_handle.clear();
     return eof;
+}
+
+template<class T>
+bool file_io<T>::is_read_only() {
+	return read_only;
 }
 
 template<class T>
@@ -83,7 +91,13 @@ file_io<T>::file_io(const std::filesystem::path& path) {
     }
     file_handle.open(path, std::ios::in | std::ios::out | std::ios:: binary);
     
-    if (!file_handle.good()) throw std::runtime_error("File " + path.generic_string() + " unavaliable");
+    if (!file_handle.good()) { // Try read-only
+        read_only = true;
+        file_handle.close();
+        file_handle.open(path, std::ios::in | std::ios:: binary);
+
+        if (!file_handle.good()) throw std::runtime_error("File " + path.generic_string() + " unavaliable");
+    }
 }
 
 template<class T>
@@ -104,6 +118,7 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
 
 template<class T>
 bool file_io<T>::write_record(const T* rec, const db_id_t id) {
+    if (read_only) return false;
 	if (id != -1) seek_line(id);
 
 	if (file_handle.good()) {
