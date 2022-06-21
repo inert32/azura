@@ -167,7 +167,24 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
     }
 }
 
-#define restore_old_value (buf == "-" && old_data != nullptr)
+template<>
+unparsed_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
+    unparsed_t raw;
+    parsers<employe_t> parser;
+    tablist<employe_t> tabs;
+    if (old_data != nullptr) raw = parser.record_to_raw(old_data);
+
+    for (int i = 1; i < 7; i++) {
+        std::string buf;
+        if (i != 5) std::cout << tabs.get(i) << ": ";
+        else std::cout << "Roles: 0 - (G)uide, 1 - (M)anager, 2 - (C)hief: ";
+        std::getline(std::cin, buf);
+        if (buf != "-") raw.fields[i] = buf;
+    }
+
+    return raw;
+}
+
 
 bool min_ui::adduser(io_base<employe_t>* employes) {
     std::cout << "Create new user: " << std::endl;

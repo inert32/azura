@@ -37,6 +37,8 @@ int main(int argc, char** argv) {
             delete employes_io;
 			delete ui_global;
             delete secure;
+
+            return -1;
         }
 		else if (!ui_global->login()) {
 			ui_global->err("Login failed");
@@ -44,6 +46,8 @@ int main(int argc, char** argv) {
             delete employes_io;
 			delete ui_global;
             delete secure;
+
+            return -1;
 		}
         auto employes = new db_base<employe_t>(employes_io);
 

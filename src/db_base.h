@@ -31,6 +31,7 @@ private:
 template<class T>
 db_base<T>::db_base(io_base<T>* _io) { 
     io = _io;
+    if (io == nullptr) return;
     db_id_t id = 0;
     while (true) {
         T tmp;
@@ -54,6 +55,7 @@ db_id_t db_base<T>::db_size() {
 
 template<class T>
 bool db_base<T>::db_sync() {
+    if (io == nullptr) return false;
     bool ret = true;
     if (have_removed) {
         io->have_removed();
