@@ -350,11 +350,13 @@ bool curses_ui_main<employe_t>::create_record(unparsed_t* new_data, employe_t* o
     mvwprintw(raw, 2, 2, tabs.get(0));
     FIELD* fields[6];
     for (int i = 0; i < 5; i++) {
-        mvwprintw(raw, 2 + (i+1) * 2, 2, tabs.get(i + 1));
+        mvwprintw(raw, 2 + i * 2, 2, tabs.get(i));
         fields[i] = new_field(1, 20, 2 + i * 2, 12, 0, 0);
         set_field_back(fields[i], A_UNDERLINE);
         set_field_buffer(fields[i], 0, new_data->fields[i + 1].c_str());
     }
+    mvwprintw(raw, 12, 2, tabs.get(6)); // Password field
+    mvwprintw(raw, 14, 2, tabs.get(5)); // Role field
     fields[5] = nullptr;
     FORM* form = new_form(fields);
     prep_form(form);
