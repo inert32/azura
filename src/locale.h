@@ -4,22 +4,8 @@
 #include <string>
 #include "base.h"
 
-extern const std::string AZ_LOC_PROGNAME;
-
-extern const std::string AZ_LOC_MENU_MM;
-extern const std::string AZ_LOC_MENU_ENTRY;
-extern const std::string AZ_LOC_MENU_DB;
-
-extern const std::string AZ_LOC_MENU_MM_SWUSER;
-extern const std::string AZ_LOC_MENU_MM_SWTAB;
-extern const std::string AZ_LOC_MENU_MM_QUIT;
 extern const std::string AZ_LOC_MENU_ENTRY_ADD;
 extern const std::string AZ_LOC_MENU_ENTRY_EDIT;
-extern const std::string AZ_LOC_MENU_ENTRY_REMOVE;
-extern const std::string AZ_LOC_MENU_DB_NEW;
-extern const std::string AZ_LOC_MENU_DB_SAVE;
-extern const std::string AZ_LOC_MENU_DB_BACKUP;
-extern const std::string AZ_LOC_MENU_DB_REMOVE;
 
 extern const std::string AZ_LOC_TAB_ID;
 extern const std::string AZ_LOC_TAB_SURNAME;
