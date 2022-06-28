@@ -48,7 +48,7 @@ public:
               db_base<employe_t>* employes);
     
     bool login();
-    bool adduser(io_base<employe_t>* employes);
+    bool adduser();
 private:
     tables_list current;
 };

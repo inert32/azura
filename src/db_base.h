@@ -8,7 +8,7 @@ template<class T>
 class db_base {
 public:
     db_base(io_base<T>* _io);
-    ~db_base();
+    virtual ~db_base();
 
     bool record_create(unparsed_t* rec);
     T* record_read(const db_id_t id);

@@ -31,7 +31,7 @@ template<class T>
 unparsed_t parsers<T>::parse(const std::string& str) {
     unparsed_t raw;
     std::string buf;
-    size_t left = 0, right = str.find(','), field = 0;
+    size_t left = 0, right = str.find(',');
 
     for (int i = 0; i < 7; i++) {
         buf = str.substr(left, right - left);
@@ -39,7 +39,7 @@ unparsed_t parsers<T>::parse(const std::string& str) {
 
         left = right + 1;
         right = str.find(',', right + 1);
-        if (right == -1) right = str.length();
+        if (right == (size_t)-1) right = str.length();
     }
     return raw;
 }

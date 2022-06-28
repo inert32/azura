@@ -20,19 +20,23 @@ enum class io_codes {
     * 1 - struct is corrupt
     * 2 - reached EOF
     * 3 - access denied for this uid
-    */
+*/
+
+constexpr auto end_file = (unsigned long long)-1;
 
 template<class T>
 class io_base {
 public:
-    virtual io_codes read_record(T* rec, const db_id_t id = -1) = 0;
-    virtual bool write_record(const T* rec, const db_id_t id = -1) = 0;
+    virtual io_codes read_record(T* rec, const db_id_t id = end_file) = 0;
+    virtual bool write_record(const T* rec, const db_id_t id = end_file) = 0;
     virtual void sync() = 0;
 
     virtual bool is_empty() = 0;
     virtual bool is_read_only() = 0;
 
     virtual void have_removed() = 0;
+    
+    virtual ~io_base() = default;
 };
 
 template<class T>
@@ -41,8 +45,8 @@ public:
     file_io(const std::filesystem::path& path);
     ~file_io();
     
-    io_codes read_record(T* rec, const db_id_t id = -1);
-    bool write_record(const T* rec, const db_id_t id = -1);
+    io_codes read_record(T* rec, const db_id_t id = end_file);
+    bool write_record(const T* rec, const db_id_t id = end_file);
     void sync();
 
     bool is_empty();
@@ -102,7 +106,7 @@ file_io<T>::file_io(const std::filesystem::path& path) {
 
 template<class T>
 io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
-    if (id != -1) 
+    if (id != end_file) 
         if (!seek_line(id)) return io_codes::eof;
 
     std::string buf_str;
@@ -120,7 +124,7 @@ io_codes file_io<T>::read_record(T* rec, const db_id_t id) {
 template<class T>
 bool file_io<T>::write_record(const T* rec, const db_id_t id) {
     if (read_only) return false;
-	if (id != -1) seek_line(id);
+	if (id != end_file) seek_line(id);
 
 	if (file_handle.good()) {
 		_write_rec(rec);

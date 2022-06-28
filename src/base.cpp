@@ -8,7 +8,7 @@ std::string purify_buf(const std::string& buf) {
     return out.substr(0, out.find_first_of(' '));
 }
 
-const bool operator>(const date& d1, const date& d2) {
+bool operator>(const date& d1, const date& d2) {
     constexpr auto sec_in_year = 31536000;
     constexpr auto leap_seconds = 86400;
 
@@ -20,7 +20,7 @@ const bool operator>(const date& d1, const date& d2) {
 
     return unixtime_d1 > unixtime_d2;
 }
-const bool operator<(const date& d1, const date& d2) {
+bool operator<(const date& d1, const date& d2) {
     constexpr auto sec_in_year = 31536000;
     constexpr auto leap_seconds = 86400;
 

@@ -528,7 +528,7 @@ bool _form_control(FORM* form, WINDOW* wnd) {
     return send_away;
 }
 
-bool curses_ui::adduser(io_base<employe_t>* employes) {
+bool curses_ui::adduser() {
     auto ui = new curses_ui_main<employe_t>;
     unparsed_t reg;
     bool out = ui->create_record(&reg, nullptr);

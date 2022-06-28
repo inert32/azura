@@ -29,8 +29,8 @@ public:
     bool is_leap() const;
     bool validate();
 
-    friend const bool operator>(const date& d1, const date& d2);
-    friend const bool operator<(const date& d1, const date& d2);
+    friend bool operator>(const date& d1, const date& d2);
+    friend bool operator<(const date& d1, const date& d2);
     friend std::ostream& operator<<(std::ostream& out, const date& date);
 private:
     unsigned short int day = 1;

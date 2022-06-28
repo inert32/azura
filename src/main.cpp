@@ -29,9 +29,10 @@ int main(int argc, char** argv) {
     ui_global = new current_ui();
     try {
         auto employes_io = new file_io<employe_t>(employes_file_path);
-        if (employes_io->is_read_only()) ui_global->msg("File " + employes_file_path.generic_string() + " is read-only");
+        if (employes_io->is_read_only()) 
+            ui_global->msg("File " + employes_file_path.generic_string() + " is read-only");
         secure = new secure_ctl(employes_io);
-        if (secure->need_admin() && !ui_global->adduser(employes_io)) {
+        if (secure->need_admin() && !ui_global->adduser()) {
             ui_global->err("Registration failed");
 
             delete employes_io;

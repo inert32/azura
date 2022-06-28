@@ -34,7 +34,7 @@ public:
                       db_base<employe_t>* employes) = 0;
     
     virtual bool login() = 0;
-    virtual bool adduser(io_base<employe_t>* employes) = 0;
+    virtual bool adduser() = 0;
 };
 
 extern ui_base* ui_global;

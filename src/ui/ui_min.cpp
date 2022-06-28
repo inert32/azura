@@ -186,7 +186,7 @@ unparsed_t min_ui_main<employe_t>::create_record(employe_t* old_data) {
 }
 
 
-bool min_ui::adduser(io_base<employe_t>* employes) {
+bool min_ui::adduser() {
     std::cout << "Create new user: " << std::endl;
     auto ui = new min_ui_main<employe_t>;
     auto reg = ui->create_record();
