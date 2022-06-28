@@ -95,7 +95,6 @@ void min_ui_main<tourist_t>::table_print(db_base<tourist_t>* table) {
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
-        if (!(entry->metadata.allow && entry->metadata.show)) continue;
         std::cout.width(5);
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id;
@@ -120,7 +119,6 @@ void min_ui_main<tour_t>::table_print(db_base<tour_t>* table) {
     for (db_id_t i = 0; i < max; i++) {
         std::cout.setf(std::ios::left, std::ios::adjustfield);
         auto entry = table->record_read(i);
-        if (!(entry->metadata.allow && entry->metadata.show)) continue;
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout.width(5);
         std::cout << entry->metadata.id;
@@ -155,7 +153,6 @@ void min_ui_main<employe_t>::table_print(db_base<employe_t>* table) {
     db_id_t max = table->db_size();
     for (db_id_t i = 0; i < max; i++) {
         auto entry = table->record_read(i);
-        if (!(entry->metadata.allow && entry->metadata.show)) continue;
         std::cout.width(5);
         if (entry->metadata.corrupt) std::cout << "!";
         std::cout << entry->metadata.id;

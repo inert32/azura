@@ -41,8 +41,6 @@ private:
 struct _metad {
     db_id_t id = 0;
     bool corrupt = false;
-    bool allow = true;
-    bool show = true;
 };
 
 struct unparsed_t {
